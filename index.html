@@ -1,0 +1,3385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generador de título, POH y tabla de operacionalización — UNASAM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet" />
+  <style>
+    /* ==========================================================================
+       Variables CSS Institucionales (Fácilmente ajustables a colores UNASAM)
+       ========================================================================== */
+    :root {
+      --color-primario: #0f3561;
+      --color-primario-oscuro: #092240;
+      --color-primario-claro: #eef4fb;
+      --color-primario-borde: #c5d8ef;
+
+      --color-acento: #b87a14;
+      --color-acento-hover: #96610c;
+      --color-acento-claro: #fdf8ee;
+
+      --color-fondo: #f6f8fb;
+      --color-superficie: #ffffff;
+      --color-superficie-suave: #f9fbfe;
+      --color-borde: #d8e0ea;
+      --color-borde-fuerte: #b4c2d4;
+
+      --color-texto: #16202e;
+      --color-texto-secundario: #475569;
+      --color-texto-tenue: #64748b;
+
+      --color-exito: #156f46;
+      --color-exito-fondo: #ecfdf3;
+      --color-exito-borde: #a7f3d0;
+
+      --color-error: #b91c1c;
+      --color-error-fondo: #fef2f2;
+      --color-error-borde: #fecaca;
+
+      --fuente-titulo: 'Source Serif 4', Georgia, serif;
+      --fuente-cuerpo: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+      --tamano-base: 14px;
+      --tamano-campo: 16px;
+
+      --radio-card: 14px;
+      --radio-control: 10px;
+      --sombra-card: 0 2px 10px -2px rgba(15, 53, 97, 0.06), 0 1px 3px 0 rgba(15, 53, 97, 0.04);
+      --sombra-hoja: 0 10px 30px -5px rgba(15, 32, 58, 0.12), 0 4px 12px -2px rgba(15, 32, 58, 0.06);
+      --transicion: all 180ms ease;
+    }
+
+    /* ==========================================================================
+       Base Tipográfica y Accesibilidad
+       ========================================================================== */
+    html {
+      scroll-behavior: smooth;
+      font-size: var(--tamano-base);
+    }
+
+    body {
+      font-family: var(--fuente-cuerpo);
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--color-texto);
+      background-color: var(--color-fondo);
+      margin: 0;
+    }
+
+    h1, h2, h3, .font-serif-institucional {
+      font-family: var(--fuente-titulo);
+      color: var(--color-primario-oscuro);
+      letter-spacing: -0.01em;
+    }
+
+    /* Evitar desbordamiento horizontal en móviles y tabletas */
+    .contenedor-principal,
+    section,
+    .card-institucional {
+      max-width: 100%;
+    }
+
+    /* Ocultar apartados no activos sin eliminarlos del DOM */
+    .paso-oculto {
+      display: none !important;
+    }
+
+    /* Controles de formulario accesibles (mínimo 16 px) */
+    input[type="text"],
+    textarea,
+    select {
+      font-family: var(--fuente-cuerpo);
+      font-size: var(--tamano-campo);
+      line-height: 1.45;
+      color: var(--color-texto);
+      background-color: var(--color-superficie);
+      border: 1.5px solid var(--color-borde-fuerte);
+      border-radius: var(--radio-control);
+      padding: 10px 14px;
+      width: 100%;
+      transition: var(--transicion);
+    }
+
+    input[type="text"]::placeholder,
+    textarea::placeholder {
+      color: var(--color-texto-tenue);
+      font-size: 15px;
+    }
+
+    input[type="text"]:hover,
+    textarea:hover,
+    select:hover {
+      border-color: var(--color-primario);
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--color-primario);
+      box-shadow: 0 0 0 3px rgba(15, 53, 97, 0.16);
+    }
+
+    /* Resaltado de error en campos (conserva compatibilidad con clases anteriores) */
+    input.border-red-500,
+    select.border-red-500,
+    textarea.border-red-500 {
+      border-color: var(--color-error) !important;
+      background-color: var(--color-error-fondo) !important;
+      box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12);
+    }
+
+    button,
+    a {
+      transition: var(--transicion);
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid var(--color-acento);
+      outline-offset: 2px;
+    }
+
+    /* ==========================================================================
+       Cabecera Institucional y Barra de Progreso
+       ========================================================================== */
+    .cabecera-institucional {
+      background-color: var(--color-primario-oscuro);
+      color: #ffffff;
+      border-bottom: 3px solid var(--color-acento);
+    }
+
+    .cabecera-institucional h1,
+    .cabecera-institucional .font-serif-institucional {
+      color: #ffffff;
+    }
+
+    /* Marcador para el escudo oficial de la UNASAM:
+       Reemplace el contenido de .escudo-unasam por:
+       <img src="ruta/escudo-unasam.png" alt="Escudo de la UNASAM" class="w-full h-full object-contain" /> */
+    .escudo-unasam {
+      width: 64px;
+      height: 76px;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 3px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+    }
+
+    .escudo-unasam svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .barra-progreso-sticky {
+      position: sticky;
+      top: 0;
+      z-index: 35;
+      background-color: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--color-borde);
+      box-shadow: 0 2px 8px rgba(15, 32, 58, 0.05);
+    }
+
+    .paso-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--color-borde);
+      background-color: var(--color-superficie);
+      color: var(--color-texto);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: left;
+      width: 100%;
+    }
+
+    .paso-pill:hover {
+      border-color: var(--color-primario);
+      background-color: var(--color-primario-claro);
+    }
+
+    .paso-pill[data-estado="activo"] {
+      border-color: var(--color-primario);
+      background-color: var(--color-primario);
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(15, 53, 97, 0.2);
+    }
+
+    .paso-pill[data-estado="activo"] .paso-badge {
+      background-color: var(--color-acento);
+      color: #ffffff;
+    }
+
+    .paso-pill[data-estado="activo"] .paso-sub {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .paso-pill[data-estado="completado"]:not([data-estado="activo"]) {
+      border-color: var(--color-exito-borde);
+      background-color: var(--color-exito-fondo);
+      color: var(--color-exito);
+    }
+
+    .paso-pill[data-estado="completado"]:not([data-estado="activo"]) .paso-badge {
+      background-color: var(--color-exito);
+      color: #ffffff;
+    }
+
+    .paso-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background-color: var(--color-primario-claro);
+      color: var(--color-primario);
+      font-size: 14px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .paso-sub {
+      display: block;
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-texto-secundario);
+    }
+
+    /* ==========================================================================
+       Tarjetas, Botones y Vista Previa Tipo Hoja
+       ========================================================================== */
+    .card-institucional {
+      background-color: var(--color-superficie);
+      border: 1px solid var(--color-borde);
+      border-radius: var(--radio-card);
+      box-shadow: var(--sombra-card);
+    }
+
+    .btn-primario-acento {
+      background-color: var(--color-acento);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: var(--radio-control);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 3px 10px rgba(184, 122, 20, 0.25);
+    }
+
+    .btn-primario-acento:hover {
+      background-color: var(--color-acento-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-azul {
+      background-color: var(--color-primario);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: var(--radio-control);
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-azul:hover {
+      background-color: var(--color-primario-oscuro);
+    }
+
+    .btn-secundario {
+      background-color: var(--color-superficie);
+      color: var(--color-primario);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: var(--radio-control);
+      border: 1.5px solid var(--color-borde-fuerte);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-secundario:hover {
+      border-color: var(--color-primario);
+      background-color: var(--color-primario-claro);
+    }
+
+    .hoja-documento {
+      background-color: #ffffff;
+      border: 1px solid var(--color-borde);
+      border-top: 4px solid var(--color-primario);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: var(--sombra-hoja);
+    }
+
+    @media (min-width: 768px) {
+      .hoja-documento {
+        padding: 36px 40px;
+      }
+    }
+
+    /* Mensajes de error junto a cada campo */
+    .error-campo-texto {
+      display: none;
+      margin-top: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--color-error);
+    }
+
+    .error-campo-texto.visible {
+      display: block;
+    }
+
+    /* ==========================================================================
+       Tablas Institucionales y Modo Tarjetas Apilables en Móvil
+       ========================================================================== */
+    .tabla-institucional {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background-color: #ffffff;
+    }
+
+    .tabla-institucional thead th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: var(--color-primario);
+      color: #ffffff;
+      font-weight: 600;
+      padding: 14px 16px;
+      border: 1px solid var(--color-primario-oscuro);
+      text-align: left;
+    }
+
+    .tabla-institucional tbody td {
+      padding: 14px 16px;
+      border: 1px solid var(--color-borde);
+      vertical-align: top;
+      color: var(--color-texto);
+    }
+
+    .tabla-institucional tbody tr:nth-child(even) td {
+      background-color: var(--color-superficie-suave);
+    }
+
+    .tabla-institucional tbody tr:hover td {
+      background-color: var(--color-primario-claro);
+    }
+
+    /* En pantallas pequeñas (< 768px), cada fila se convierte en tarjeta sin scroll horizontal */
+    @media (max-width: 767px) {
+      .tabla-responsiva thead {
+        display: none;
+      }
+
+      .tabla-responsiva,
+      .tabla-responsiva tbody,
+      .tabla-responsiva tr,
+      .tabla-responsiva td {
+        display: block;
+        width: 100%;
+      }
+
+      .tabla-responsiva tbody tr {
+        margin-bottom: 14px;
+        border: 1.5px solid var(--color-borde-fuerte);
+        border-radius: 12px;
+        background-color: #ffffff;
+        box-shadow: var(--sombra-card);
+        overflow: hidden;
+      }
+
+      .tabla-responsiva tbody td {
+        border: none;
+        border-bottom: 1px solid var(--color-borde);
+        padding: 12px 14px;
+      }
+
+      .tabla-responsiva tbody td:last-child {
+        border-bottom: none;
+      }
+
+      .tabla-responsiva tbody td[data-etiqueta]::before {
+        content: attr(data-etiqueta);
+        display: block;
+        font-weight: 700;
+        color: var(--color-primario);
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+    }
+
+    /* ==========================================================================
+       Notificaciones Toast
+       ========================================================================== */
+    .toast-contenedor {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: calc(100vw - 48px);
+    }
+
+    .toast-mensaje {
+      background-color: var(--color-primario-oscuro);
+      color: #ffffff;
+      border-left: 4px solid var(--color-exito-borde);
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(9, 34, 64, 0.25);
+      animation: aparecerToast 180ms ease-out;
+    }
+
+    .toast-mensaje.toast-error {
+      border-left-color: #fca5a5;
+      background-color: #7f1d1d;
+    }
+
+    @keyframes aparecerToast {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ==========================================================================
+       Modo Impresión Limpio
+       ========================================================================== */
+    @media print {
+      .paso-oculto {
+        display: block !important;
+      }
+
+      .no-imprimir,
+      .barra-progreso-sticky,
+      .toast-contenedor {
+        display: none !important;
+      }
+
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        font-size: 12pt;
+      }
+
+      .card-institucional,
+      .hoja-documento {
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+        break-inside: avoid;
+      }
+
+      .tabla-institucional thead th {
+        background-color: #e2e8f0 !important;
+        color: #000000 !important;
+        position: static !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- ========================================================================
+       CABECERA INSTITUCIONAL
+       ======================================================================== -->
+  <header class="cabecera-institucional no-imprimir">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        <div class="flex items-start sm:items-center gap-4">
+          <!-- Escudo de la Universidad Nacional Santiago Antúnez de Mayolo (UNASAM) -->
+          <div id="escudoUnasamSlot" class="escudo-unasam" aria-label="Escudo de la UNASAM">
+            <svg viewBox="0 0 240 300" role="img" aria-label="Escudo de la UNASAM">
+              <defs>
+                <linearGradient id="bordeMetalUnasam" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#e5e7eb" />
+                  <stop offset="45%" stop-color="#9ca3af" />
+                  <stop offset="100%" stop-color="#4b5563" />
+                </linearGradient>
+                <linearGradient id="cuadranteNaranja" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff9900" />
+                  <stop offset="100%" stop-color="#ea580c" />
+                </linearGradient>
+                <linearGradient id="cuadranteAzul" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#0284c7" />
+                  <stop offset="100%" stop-color="#0369a1" />
+                </linearGradient>
+                <linearGradient id="cuadranteCordillera" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#2563eb" />
+                  <stop offset="100%" stop-color="#93c5fd" />
+                </linearGradient>
+                <path
+                  id="caminoLemaSuperior"
+                  d="M 28,62 Q 120,24 212,62"
+                  fill="none"
+                />
+                <path
+                  id="caminoLemaInferior"
+                  d="M 52,258 Q 120,294 188,258"
+                  fill="none"
+                />
+              </defs>
+
+              <!-- Silueta exterior del escudo heráldico -->
+              <path
+                d="M 18,12 L 222,12 L 222,158 C 222,235 175,278 120,290 C 65,278 18,235 18,158 Z"
+                fill="url(#bordeMetalUnasam)"
+                stroke="#111827"
+                stroke-width="4"
+              />
+
+              <!-- Campo interior del escudo -->
+              <path
+                d="M 44,68 L 196,68 L 196,156 C 196,214 160,248 120,258 C 80,248 44,214 44,156 Z"
+                fill="#1f2937"
+                stroke="#111827"
+                stroke-width="3"
+              />
+
+              <!-- Cuadrante 1 (Superior Izquierdo): Cabeza clava / lítica sobre fondo naranja -->
+              <rect x="50" y="74" width="67" height="80" fill="url(#cuadranteNaranja)" />
+              <g transform="translate(83, 114)" stroke="#111827" stroke-width="2.2" fill="#f8fafc">
+                <ellipse cx="0" cy="4" rx="22" ry="20" fill="#111827" />
+                <path d="M -6,-18 C -4,-23 4,-23 6,-18 Z" fill="#e2e8f0" />
+                <circle cx="-7" cy="0" r="6.5" fill="#ffffff" />
+                <circle cx="-7" cy="0" r="2.5" fill="#111827" />
+                <circle cx="8" cy="1" r="6" fill="#ffffff" />
+                <circle cx="8" cy="1" r="2.5" fill="#111827" />
+                <path d="M -2,2 C 6,2 13,6 12,12 C 11,16 3,15 -2,12 Z" fill="#cbd5e1" />
+                <path d="M -14,13 C -12,21 -6,23 -2,20" fill="none" stroke="#ffffff" stroke-width="3" />
+                <path d="M 13,13 C 12,20 7,23 3,20" fill="none" stroke="#ffffff" stroke-width="3" />
+              </g>
+
+              <!-- Cuadrante 2 (Superior Derecho): Cordillera nevada y valle -->
+              <rect x="123" y="74" width="67" height="80" fill="url(#cuadranteCordillera)" />
+              <polygon points="123,115 144,90 162,107 177,89 190,108 190,126 123,126" fill="#ffffff" />
+              <polygon points="144,90 151,98 146,104 140,98" fill="#bae6fd" />
+              <polygon points="177,89 183,98 178,103 172,97" fill="#bae6fd" />
+              <path d="M 123,122 Q 155,126 190,136 L 190,154 L 123,154 Z" fill="#15803d" />
+              <path d="M 158,136 Q 175,126 190,122 L 190,154 L 158,154 Z" fill="#7c2d12" />
+
+              <!-- Cuadrante 3 (Inferior Izquierdo): Mar y olas -->
+              <path d="M 50,160 L 117,160 L 117,249 C 82,242 56,212 50,160 Z" fill="url(#cuadranteAzul)" />
+              <g fill="none" stroke="#e0f2fe" stroke-width="2.2" stroke-linecap="round">
+                <path d="M 54,185 Q 65,180 76,185 T 98,185 T 115,185" />
+                <path d="M 56,200 Q 67,195 78,200 T 100,200 T 115,200" />
+                <path d="M 60,215 Q 71,210 82,215 T 104,215 T 115,215" />
+                <path d="M 67,230 Q 78,225 89,230 T 113,230" />
+              </g>
+
+              <!-- Cuadrante 4 (Inferior Derecho): Libro abierto, pico y lampa -->
+              <path d="M 123,160 L 190,160 C 184,212 158,242 123,249 Z" fill="#ffffff" />
+              <!-- Libro abierto superior -->
+              <g transform="translate(156, 175)" stroke="#111827" stroke-width="1.8" fill="#f8fafc">
+                <path d="M 0,-4 C -8,-9 -17,-9 -22,-6 L -22,7 C -17,4 -8,4 0,9 C 8,4 17,4 22,7 L 22,-6 C 17,-9 8,-9 0,-4 Z" />
+                <line x1="0" y1="-4" x2="0" y2="9" />
+                <line x1="-17" y1="-2" x2="-5" y2="-2" stroke-width="1.2" />
+                <line x1="-17" y1="2" x2="-5" y2="2" stroke-width="1.2" />
+                <line x1="5" y1="-2" x2="17" y2="-2" stroke-width="1.2" />
+                <line x1="5" y1="2" x2="17" y2="2" stroke-width="1.2" />
+              </g>
+              <!-- Pico y lampa cruzados -->
+              <line x1="136" y1="234" x2="174" y2="191" stroke="#5c2d16" stroke-width="5" stroke-linecap="round" />
+              <path
+                d="M 131,208 C 143,205 156,213 163,226 L 158,229 C 151,218 141,212 131,214 Z"
+                fill="#9ca3af"
+                stroke="#111827"
+                stroke-width="1.8"
+              />
+              <g transform="translate(166, 204) rotate(38)" fill="#cbd5e1" stroke="#111827" stroke-width="1.8">
+                <rect x="-5" y="-14" width="10" height="8" rx="2" fill="none" stroke-width="2.4" />
+                <rect x="-1.8" y="-6" width="3.6" height="9" fill="#9ca3af" />
+                <path d="M -11,3 L 11,3 L 8,24 C 7,28 -7,28 -8,24 Z" />
+              </g>
+
+              <!-- Lema institucional superior -->
+              <text
+                fill="#ffffff"
+                stroke="#111827"
+                stroke-width="0.9"
+                font-size="14.5"
+                font-weight="900"
+                font-family="Inter, Arial, sans-serif"
+                letter-spacing="0.8"
+              >
+                <textPath href="#caminoLemaSuperior" startOffset="50%" text-anchor="middle">
+                  HIJOS DEPENDE EL PROGRESO
+                </textPath>
+              </text>
+
+              <!-- Texto lateral izquierdo -->
+              <text
+                x="32"
+                y="156"
+                fill="#ffffff"
+                stroke="#111827"
+                stroke-width="0.8"
+                font-size="11.5"
+                font-weight="800"
+                font-family="Inter, Arial, sans-serif"
+                text-anchor="middle"
+                transform="rotate(-90, 32, 156)"
+              >
+                DEL ESFUERZO DE SUS
+              </text>
+
+              <!-- Texto lateral derecho -->
+              <text
+                x="209"
+                y="156"
+                fill="#ffffff"
+                stroke="#111827"
+                stroke-width="0.8"
+                font-size="11.5"
+                font-weight="800"
+                font-family="Inter, Arial, sans-serif"
+                text-anchor="middle"
+                transform="rotate(90, 209, 156)"
+              >
+                DE LOS PUEBLOS
+              </text>
+
+              <!-- Sigla inferior UNASAM -->
+              <text
+                fill="#ffffff"
+                stroke="#111827"
+                stroke-width="1"
+                font-size="17"
+                font-weight="900"
+                font-family="Inter, Arial, sans-serif"
+                letter-spacing="1.5"
+              >
+                <textPath href="#caminoLemaInferior" startOffset="50%" text-anchor="middle">
+                  UNASAM
+                </textPath>
+              </text>
+            </svg>
+          </div>
+
+          <div>
+            <p class="text-sm font-medium text-amber-200">
+              Universidad Nacional Santiago Antúnez de Mayolo
+            </p>
+            <h1 class="text-2xl sm:text-3xl font-bold leading-snug mt-0.5">
+              Generador de título, POH y tabla de operacionalización
+            </h1>
+            <p class="text-sm text-slate-200 mt-1">
+              Basado en Hernández-Sampieri &amp; Mendoza (2018), Vara-Horna (2012), César Vara (2015) y Villanueva (2018 – UNASAM)
+            </p>
+          </div>
+        </div>
+
+        <!-- Acciones Principales y Menú Desplegable de Exportación -->
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" onclick="cargarEjemploInstitucional()" class="btn-secundario">
+            Cargar ejemplo
+          </button>
+
+          <button type="button" onclick="reiniciarAvanceApp()" class="btn-secundario">
+            Reiniciar
+          </button>
+
+          <!-- Botón Principal Único Destacado -->
+          <button type="button" onclick="exportarDocxHtml()" class="btn-primario-acento">
+            Descargar Word (.DOCX)
+          </button>
+
+          <!-- Menú Desplegable Exportar con opción de Descargar App .HTML -->
+          <div id="menuExportarContenedor" class="relative hidden">
+            <button
+              type="button"
+              id="btnMasOpcionesExportar"
+              aria-expanded="false"
+              aria-haspopup="menu"
+              aria-controls="dropdownExportar"
+              onclick="alternarMenuExportar(event)"
+              class="btn-secundario"
+            >
+              <span>Exportar</span>
+              <span aria-hidden="true">▾</span>
+            </button>
+
+            <div
+              id="dropdownExportar"
+              role="menu"
+              class="hidden absolute right-0 mt-2 w-64 rounded-xl bg-white text-slate-800 border border-slate-300 shadow-xl py-1.5 z-50"
+            >
+              <button
+                type="button"
+                role="menuitem"
+                onclick="copiarTodoHtml(); cerrarMenuExportar();"
+                class="w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-100"
+              >
+                Copiar enunciados
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onclick="exportarTxtHtml(); cerrarMenuExportar();"
+                class="hidden w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-100"
+              >
+                Exportar texto plano (.TXT)
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onclick="window.print(); cerrarMenuExportar();"
+                class="w-full text-left px-4 py-3 text-sm font-medium hover:bg-slate-100"
+              >
+                Imprimir / Guardar PDF
+              </button>
+              <div class="my-1 border-t border-slate-200"></div>
+              <button
+                type="button"
+                role="menuitem"
+                onclick="descargarAppHtml(); cerrarMenuExportar();"
+                class="hidden w-full text-left px-4 py-3 text-sm font-semibold text-blue-900 hover:bg-blue-50 flex items-center justify-between"
+              >
+                <span>Descargar App .HTML</span>
+                <span class="text-xs font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-800">HTML</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       INDICADOR DE PROGRESO FIJO (STICKY) CON LOS 4 PASOS
+       ======================================================================== -->
+  <nav aria-label="Progreso de los 4 pasos" class="barra-progreso-sticky no-imprimir">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 text-sm">
+        <span id="estadoGuardadoLocal" class="font-medium text-slate-600">
+          Guardado automático activo en este equipo
+        </span>
+        <span id="porcentajeAvanceTexto" class="font-bold text-slate-800">
+          Avance completado: 0%
+        </span>
+      </div>
+
+      <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden" aria-hidden="true">
+        <div
+          id="barraAvancePorcentaje"
+          class="h-full rounded-full transition-all duration-200"
+          style="width: 0%; background-color: var(--color-primario);"
+        ></div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <a href="#paso-1" id="navPaso1" data-estado="activo" onclick="establecerPasoActivo(1)" class="paso-pill">
+          <span class="paso-badge" id="badgePaso1">1</span>
+          <span>
+            <span>Planteamiento</span>
+            <span class="paso-sub">Título, problemas e hipótesis</span>
+          </span>
+        </a>
+
+        <a href="#paso-2" id="navPaso2" data-estado="pendiente" onclick="establecerPasoActivo(2)" class="paso-pill">
+          <span class="paso-badge" id="badgePaso2">2</span>
+          <span>
+            <span>Tabla de operacionalización de variables</span>
+            <span class="paso-sub">Conceptos, dimensiones e indicadores</span>
+          </span>
+        </a>
+
+        <a href="#paso-3" id="navPaso3" data-estado="pendiente" onclick="establecerPasoActivo(3)" class="paso-pill">
+          <span class="paso-badge" id="badgePaso3">3</span>
+          <span>
+            <span>Cuestionario Likert</span>
+            <span class="paso-sub">Ítems en 1.ª persona y escala</span>
+          </span>
+        </a>
+
+        <a href="#paso-4" id="navPaso4" data-estado="pendiente" onclick="establecerPasoActivo(4)" class="paso-pill">
+          <span class="paso-badge" id="badgePaso4">4</span>
+          <span>
+            <span>Matriz integral</span>
+            <span class="paso-sub">Cuadro consolidado final</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ========================================================================
+       CONTENIDO PRINCIPAL
+       ======================================================================== -->
+  <main id="inicio-contenido-principal" class="contenedor-principal max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+    <!-- Resumen discreto de validación (se muestra solo si hay campos incompletos al validar) -->
+    <div
+      id="alertaValidacion"
+      role="alert"
+      class="hidden rounded-xl p-4 border"
+      style="background-color: var(--color-error-fondo); border-color: var(--color-error-borde); color: var(--color-error);"
+    >
+      <p class="font-bold">Revisa los campos marcados en rojo antes de continuar o exportar:</p>
+      <p id="textoFaltantes" class="mt-1 font-medium"></p>
+    </div>
+
+    <div
+      id="alertaExito"
+      role="status"
+      class="hidden rounded-xl p-4 border font-semibold"
+      style="background-color: var(--color-exito-fondo); border-color: var(--color-exito-borde); color: var(--color-exito);"
+    >
+      Estructura validada correctamente. Todos los campos obligatorios están completos.
+    </div>
+
+    <!-- ======================================================================
+         PASO 1: CONFIGURACIÓN METODOLÓGICA Y PLANTEAMIENTO
+         ====================================================================== -->
+    <section id="paso-1" aria-labelledby="tituloPaso1" class="space-y-5">
+      <div class="card-institucional p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-md text-sm font-semibold mb-2" style="background-color: var(--color-primario-claro); color: var(--color-primario);">
+            Paso 1 de 4
+          </span>
+          <h2 id="tituloPaso1" class="text-xl sm:text-2xl font-bold">
+            Configuración metodológica y planteamiento del problema
+          </h2>
+          <p class="text-slate-600 mt-1">
+            Completa las variables, dimensiones y contexto del estudio para formular el título y los enunciados generales y específicos.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+        <!-- Columna Izquierda: Formulario -->
+        <div class="lg:col-span-6 card-institucional p-6 sm:p-7 space-y-6">
+          <div class="rounded-xl p-5 space-y-4 border" style="background-color: var(--color-superficie-suave); border-color: var(--color-borde);">
+            <h3 class="text-lg font-bold">Criterios metodológicos</h3>
+
+            <div>
+              <label for="autorHtml" class="block font-semibold text-slate-800 mb-1.5">
+                Referencia o autor metodológico
+              </label>
+              <select id="autorHtml" onchange="alCambiarAutorHtml(); guardarEstadoLocal();">
+                <option value="sampieri">H. Sampieri &amp; Mendoza (2018) — Cuantitativo clásico</option>
+                <option value="varaHorna">A. Vara-Horna (2012) — Empresarial y de impacto</option>
+                <option value="cesarVara">César Vara (2015) — Científico empresarial</option>
+                <option value="villanueva">L. Villanueva (2018 - UNASAM) — Administrativo UNASAM</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="alcanceHtml" class="block font-semibold text-slate-800 mb-1.5">
+                  Alcance o nivel del estudio
+                </label>
+                <select id="alcanceHtml" onchange="alCambiarAlcanceHtml(); guardarEstadoLocal();">
+                  <option value="correlacional">Correlacional</option>
+                  <option value="explicativo">Explicativo</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="disenoHtml" class="block font-semibold text-slate-800 mb-1.5">
+                  Tipo de relación
+                </label>
+                <select id="disenoHtml" onchange="toggleMultivariadaHtml(); guardarEstadoLocal();">
+                  <option value="bivariada">Bivariada</option>
+                  <option value="multivariada">Multivariada</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="prefijoHtml" class="block font-semibold text-slate-800 mb-1.5">
+                  Inicio del título (opcional)
+                </label>
+                <select id="prefijoHtml" onchange="renderizarTodoHtml(); guardarEstadoLocal();"></select>
+              </div>
+
+              <div>
+                <label for="conectorHtml" class="block font-semibold text-slate-800 mb-1.5">
+                  Conector entre variable 1 y variable 2
+                </label>
+                <select id="conectorHtml" onchange="alCambiarConectorManualHtml(); renderizarTodoHtml(); guardarEstadoLocal();"></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Variables de Estudio -->
+          <div class="space-y-4">
+            <h3 class="text-lg font-bold">Variables de investigación</h3>
+
+            <div>
+              <label for="v1Html" class="block font-semibold text-slate-800 mb-1.5">
+                Variable 1 (V1)
+              </label>
+              <input
+                id="v1Html"
+                type="text"
+                aria-describedby="err-v1Html"
+                oninput="limpiarErrorHtml(this); ocultarErrorCampo('err-v1Html'); sincronizarConectorAutomaticoHtml(); renderizarTodoHtml(); guardarEstadoLocal();"
+                placeholder="Ej. Clima organizacional"
+              />
+              <p id="err-v1Html" class="error-campo-texto">Ingresa la Variable 1 (V1) para continuar.</p>
+            </div>
+
+            <div id="bloqueExtrasHtml" class="hidden rounded-xl p-4 border space-y-3" style="background-color: var(--color-superficie-suave); border-color: var(--color-borde);">
+              <div class="flex flex-wrap justify-between items-center gap-2">
+                <span class="font-semibold text-slate-800">Variables independientes adicionales</span>
+                <button type="button" onclick="agregarVarExtraHtml(); guardarEstadoLocal();" class="btn-secundario">
+                  + Añadir variable
+                </button>
+              </div>
+              <div id="listaVarsExtraHtml" class="space-y-2.5"></div>
+            </div>
+
+            <div>
+              <label for="v2Html" class="block font-semibold text-slate-800 mb-1.5">
+                Variable 2 o dependiente (V2)
+              </label>
+              <input
+                id="v2Html"
+                type="text"
+                aria-describedby="err-v2Html"
+                oninput="limpiarErrorHtml(this); ocultarErrorCampo('err-v2Html'); sincronizarConectorAutomaticoHtml(); renderizarTodoHtml(); guardarEstadoLocal();"
+                placeholder="Ej. Desempeño laboral"
+              />
+              <p id="err-v2Html" class="error-campo-texto">Ingresa la Variable 2 (V2) para continuar.</p>
+            </div>
+          </div>
+
+          <!-- Dimensiones de V1 -->
+          <div class="rounded-xl p-5 border space-y-3" style="background-color: var(--color-primario-claro); border-color: var(--color-primario-borde);">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <label class="font-bold text-slate-900">
+                Dimensiones de V1 (para problemas, objetivos e hipótesis específicos)
+              </label>
+              <button type="button" onclick="agregarDimV1Html(); guardarEstadoLocal();" class="btn-secundario">
+                + Agregar dimensión
+              </button>
+            </div>
+            <div id="contenedorDimsV1Html" class="space-y-2.5"></div>
+            <p id="err-dimsV1" class="error-campo-texto">Completa todas las dimensiones de la Variable 1.</p>
+          </div>
+
+          <!-- Dimensiones de V2 -->
+          <div class="rounded-xl p-5 border space-y-3" style="background-color: var(--color-superficie-suave); border-color: var(--color-borde);">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <label class="font-bold text-slate-900">
+                Dimensiones de V2
+              </label>
+              <button type="button" onclick="agregarDimV2Html(); guardarEstadoLocal();" class="btn-secundario">
+                + Agregar dimensión V2
+              </button>
+            </div>
+            <div id="contenedorDimsV2Html" class="space-y-2.5"></div>
+            <p id="err-dimsV2" class="error-campo-texto">Completa todas las dimensiones de la Variable 2.</p>
+          </div>
+
+          <!-- Contexto Institucional y Geográfico -->
+          <div class="space-y-4">
+            <h3 class="text-lg font-bold">Población, organización y delimitación</h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5">
+              <div class="sm:col-span-5">
+                <label for="conectorOrgHtml" class="block font-semibold text-slate-800 mb-1.5">
+                  Conector de organización
+                </label>
+                <select id="conectorOrgHtml" onchange="renderizarTodoHtml(); guardarEstadoLocal();">
+                  <option value="auto">Automático (según tipo)</option>
+                  <option value="de la">de la (Institución / Sigla)</option>
+                  <option value="del">del (Hospital / Banco / Colegio)</option>
+                  <option value="de la empresa">de la empresa ...</option>
+                  <option value="de la universidad">de la universidad ...</option>
+                  <option value="de la municipalidad de">de la municipalidad de ...</option>
+                  <option value="de la institución educativa">de la institución educativa ...</option>
+                  <option value="de">de (Directo)</option>
+                </select>
+              </div>
+
+              <div class="sm:col-span-7">
+                <label for="orgHtml" class="block font-semibold text-slate-800 mb-1.5">
+                  Organización, empresa o institución
+                </label>
+                <input
+                  id="orgHtml"
+                  type="text"
+                  aria-describedby="err-orgHtml"
+                  oninput="limpiarErrorHtml(this); ocultarErrorCampo('err-orgHtml'); renderizarTodoHtml(); guardarEstadoLocal();"
+                  placeholder="Ej. UNASAM / Constructora Andes S.A.C."
+                />
+                <p id="err-orgHtml" class="error-campo-texto">Indica la organización o institución del estudio.</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="pobHtml" class="block font-semibold text-slate-800 mb-1.5">
+                  Población o muestra
+                </label>
+                <input
+                  id="pobHtml"
+                  type="text"
+                  aria-describedby="err-pobHtml"
+                  oninput="limpiarErrorHtml(this); ocultarErrorCampo('err-pobHtml'); renderizarTodoHtml(); guardarEstadoLocal();"
+                  placeholder="Ej. trabajadores administrativos"
+                />
+                <p id="err-pobHtml" class="error-campo-texto">Indica la población o muestra participante.</p>
+              </div>
+
+              <div>
+                <label for="lugHtml" class="block font-semibold text-slate-800 mb-1.5">
+                  Lugar o ciudad
+                </label>
+                <input
+                  id="lugHtml"
+                  type="text"
+                  aria-describedby="err-lugHtml"
+                  oninput="limpiarErrorHtml(this); ocultarErrorCampo('err-lugHtml'); renderizarTodoHtml(); guardarEstadoLocal();"
+                  placeholder="Ej. distrito de Independencia, Huaraz"
+                />
+                <p id="err-lugHtml" class="error-campo-texto">Indica el lugar o ciudad de ejecución.</p>
+              </div>
+            </div>
+
+            <div>
+              <label for="anioHtml" class="block font-semibold text-slate-800 mb-1.5">
+                Año del estudio
+              </label>
+              <input
+                id="anioHtml"
+                type="text"
+                aria-describedby="err-anioHtml"
+                oninput="limpiarErrorHtml(this); ocultarErrorCampo('err-anioHtml'); renderizarTodoHtml(); guardarEstadoLocal();"
+                placeholder="Ej. 2026"
+              />
+              <p id="err-anioHtml" class="error-campo-texto">Indica el año de la investigación.</p>
+            </div>
+          </div>
+
+          <!-- Botón de validación y navegación del Paso 1 -->
+          <div class="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <button type="button" onclick="validarYGenerarHtmlConMensajes()" class="btn-azul">
+              Validar paso 1
+            </button>
+
+            <div class="flex items-center gap-2.5">
+              <button type="button" onclick="irAPaso(2)" class="btn-primario-acento">
+                Siguiente: Tabla de operacionalización de variables →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Vista Previa Tipo Hoja de Documento -->
+        <div class="lg:col-span-6 lg:sticky lg:top-36">
+          <div class="hoja-documento space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200">
+              <span class="font-semibold text-slate-700">Vista previa del documento</span>
+              <span id="badgeAutorHtml" class="px-3 py-1 rounded-full text-sm font-semibold" style="background-color: var(--color-primario-claro); color: var(--color-primario);"></span>
+            </div>
+
+            <div>
+              <p class="font-semibold text-slate-600 mb-1">Título de investigación (sin punto final)</p>
+              <p id="tituloGeneradoHtml" class="text-xl font-bold leading-snug text-slate-900"></p>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <h3 class="text-base font-bold">Problema general y específicos</h3>
+              <p id="pgHtml" class="italic font-medium text-slate-900 rounded-lg p-3.5 border" style="background-color: var(--color-superficie-suave); border-color: var(--color-borde);"></p>
+              <div id="pesHtml" class="mt-2 space-y-1.5 pl-4 border-l-2 text-slate-800" style="border-color: var(--color-primario);"></div>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <h3 class="text-base font-bold">Objetivo general y específicos</h3>
+              <p id="ogHtml" class="font-medium text-slate-900 rounded-lg p-3.5 border" style="background-color: var(--color-superficie-suave); border-color: var(--color-borde);"></p>
+              <div id="oesHtml" class="mt-2 space-y-1.5 pl-4 border-l-2 text-slate-800" style="border-color: var(--color-primario);"></div>
+            </div>
+
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+              <h3 class="text-base font-bold">Hipótesis general y específicas</h3>
+              <p id="hgHtml" class="font-medium text-slate-900 rounded-lg p-3.5 border" style="background-color: var(--color-superficie-suave); border-color: var(--color-borde);"></p>
+              <div id="hesHtml" class="mt-2 space-y-1.5 pl-4 border-l-2 text-slate-800" style="border-color: var(--color-exito);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta: Simulación gráfica · modelo estructural (estilo SmartPLS) -->
+      <div class="card-institucional p-5 sm:p-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="color: var(--color-primario);">
+              <rect x="9" y="2" width="6" height="5" rx="1"></rect>
+              <rect x="2" y="16" width="6" height="5" rx="1"></rect>
+              <rect x="16" y="16" width="6" height="5" rx="1"></rect>
+              <path d="M12 7v4M5 16v-3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"></path>
+            </svg>
+            <h3 class="text-base sm:text-lg font-bold m-0">
+              Simulación gráfica · modelo estructural (estilo SmartPLS)
+            </h3>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-4">
+            <div class="flex items-center gap-4 text-sm font-medium text-slate-700">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="inline-block w-3.5 h-3.5 rounded-full" style="background: radial-gradient(circle at 35% 35%, #3b82f6, #1d4ed8);"></span>
+                Variable
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="inline-block w-4 h-3 rounded-xs border" style="background-color: #e0b422; border-color: #b48a10;"></span>
+                Dimensión
+              </span>
+            </div>
+
+            <button type="button" onclick="descargarModeloPng()" class="btn-secundario no-imprimir">
+              Descargar gráfico (PNG)
+            </button>
+          </div>
+        </div>
+
+        <div class="rounded-xl border overflow-x-auto" style="background-color: var(--color-superficie-suave); border-color: var(--color-borde);">
+          <div id="contenedorSvgSmartPls" style="min-width: 680px;"></div>
+        </div>
+
+        <p id="resumenModeloSmartPls" class="text-sm text-slate-600 font-medium m-0">
+          Modelo bivariado · 2 variables (V1–V2) · 4 dimensiones · elija el alcance para definir el sentido de las flechas.
+        </p>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PASO 2: OPERACIONALIZACIÓN DE VARIABLES
+         ====================================================================== -->
+    <section id="paso-2" aria-labelledby="tituloPaso2" class="paso-oculto card-institucional p-6 sm:p-8 space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-md text-sm font-semibold mb-2" style="background-color: var(--color-primario-claro); color: var(--color-primario);">
+            Paso 2 de 4
+          </span>
+          <h2 id="tituloPaso2" class="text-xl sm:text-2xl font-bold">
+            Tabla de operacionalización de variables
+          </h2>
+          <p class="text-slate-600 mt-1">
+            Registra la definición conceptual de cada variable y los indicadores observables por dimensión.
+          </p>
+        </div>
+
+        <button type="button" onclick="copiarSeccionTabla('cuerpoTablaOperacionalizacionHtml', 'Tabla de operacionalización')" class="btn-secundario no-imprimir">
+          Copiar tabla
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 rounded-xl p-5 border" style="background-color: var(--color-superficie-suave); border-color: var(--color-borde);">
+        <!-- Definición e indicadores V1 -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold">Variable 1: definiciones e indicadores</h3>
+          <div>
+            <label for="defV1Html" class="block font-semibold text-slate-800 mb-1.5">
+              Definición conceptual de V1 (con autor y año)
+            </label>
+            <textarea
+              id="defV1Html"
+              rows="3"
+              oninput="renderizarTodoHtml(); guardarEstadoLocal();"
+              placeholder="Ej. Conjunto de percepciones compartidas por los trabajadores sobre su entorno laboral (Chiavenato, 2017)."
+            ></textarea>
+          </div>
+          <div id="configIndicadoresV1Html" class="space-y-3"></div>
+        </div>
+
+        <!-- Definición e indicadores V2 -->
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h3 class="text-lg font-bold">Variable 2: definiciones e indicadores</h3>
+            <button type="button" onclick="agregarDimV2Html(); guardarEstadoLocal();" class="btn-secundario">
+              + Agregar dimensión V2
+            </button>
+          </div>
+          <div>
+            <label for="defV2Html" class="block font-semibold text-slate-800 mb-1.5">
+              Definición conceptual de V2 (con autor y año)
+            </label>
+            <textarea
+              id="defV2Html"
+              rows="3"
+              oninput="renderizarTodoHtml(); guardarEstadoLocal();"
+              placeholder="Ej. Grado de cumplimiento efectivo de las funciones y metas asignadas al trabajador (Robbins &amp; Judge, 2018)."
+            ></textarea>
+          </div>
+          <div id="configIndicadoresV2Html" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- Tabla de Operacionalización (se adapta a tarjetas en pantallas pequeñas) -->
+      <div class="rounded-xl border border-slate-300 overflow-hidden">
+        <table class="tabla-institucional tabla-responsiva">
+          <thead>
+            <tr>
+              <th class="w-48">Variables</th>
+              <th class="w-80">Definición conceptual</th>
+              <th class="w-52">Dimensiones</th>
+              <th>Indicadores</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTablaOperacionalizacionHtml"></tbody>
+        </table>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 no-imprimir">
+        <button type="button" onclick="irAPaso(1)" class="btn-secundario">
+          ← Anterior: Planteamiento
+        </button>
+        <button type="button" onclick="irAPaso(3)" class="btn-primario-acento">
+          Siguiente: Cuestionario Likert →
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PASO 3: CUESTIONARIO CON ESCALA LIKERT
+         ====================================================================== -->
+    <section id="paso-3" aria-labelledby="tituloPaso3" class="paso-oculto card-institucional p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-slate-200 pb-4">
+        <div>
+          <span class="inline-block px-3 py-1 rounded-md text-sm font-semibold mb-2" style="background-color: var(--color-primario-claro); color: var(--color-primario);">
+            Paso 3 de 4
+          </span>
+          <h2 id="tituloPaso3" class="text-xl sm:text-2xl font-bold">
+            Cuestionario o instrumento con escala Likert
+          </h2>
+          <p class="text-slate-600 mt-1">
+            Ítems redactados en primera persona, tiempo presente simple y vocabulario variado por indicador.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-end gap-3 no-imprimir">
+          <div class="w-full sm:w-80">
+            <label for="tipoEscalaHtml" class="block font-semibold text-slate-800 mb-1.5">
+              Tipo de escala Likert
+            </label>
+            <select id="tipoEscalaHtml" onchange="renderizarTodoHtml(); guardarEstadoLocal();">
+              <option value="frecuencia">Frecuencia (Nunca – Siempre)</option>
+              <option value="acuerdo">Acuerdo (Totalmente en desacuerdo – Totalmente de acuerdo)</option>
+              <option value="calidad">Valoración / Calidad (Muy malo – Muy bueno)</option>
+              <option value="satisfaccion">Satisfacción (Muy insatisfecho – Muy satisfecho)</option>
+            </select>
+          </div>
+
+          <button type="button" onclick="copiarSeccionTabla('cuerpoLikertHtml', 'Cuestionario con escala Likert')" class="btn-secundario">
+            Copiar tabla
+          </button>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-300 overflow-hidden">
+        <table class="tabla-institucional tabla-responsiva">
+          <thead id="cabeceraLikertHtml"></thead>
+          <tbody id="cuerpoLikertHtml"></tbody>
+        </table>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 no-imprimir">
+        <button type="button" onclick="irAPaso(2)" class="btn-secundario">
+          ← Anterior: Operacionalización
+        </button>
+        <button type="button" onclick="irAPaso(4)" class="btn-primario-acento">
+          Siguiente: Matriz integral →
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         PASO 4: TABLA DE MATRIZ DE CONSISTENCIA INTEGRAL (AL FINAL)
+         ====================================================================== -->
+    <section id="paso-4" aria-labelledby="tituloPaso4" class="paso-oculto space-y-6">
+      <div class="card-institucional p-6 sm:p-8 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <div>
+            <span class="inline-block px-3 py-1 rounded-md text-sm font-semibold mb-2" style="background-color: var(--color-primario-claro); color: var(--color-primario);">
+              Paso 4 de 4
+            </span>
+            <h2 id="tituloPaso4" class="text-xl sm:text-2xl font-bold">
+              Tabla de matriz de consistencia integral
+            </h2>
+            <p class="text-slate-600 mt-1">
+              Relación horizontal entre título, problemas, objetivos, hipótesis, variables y metodología.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 no-imprimir">
+            <button type="button" onclick="copiarSeccionTabla('cuerpoMatrizConsistenciaHtml', 'Matriz de consistencia')" class="btn-secundario">
+              Copiar tabla
+            </button>
+            <button type="button" onclick="exportarDocxHtml()" class="btn-primario-acento">
+              Descargar Word (.DOCX)
+            </button>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-slate-300 overflow-hidden">
+          <table class="tabla-institucional tabla-responsiva">
+            <thead>
+              <tr>
+                <th class="w-44">Título</th>
+                <th class="w-56">Problemas</th>
+                <th class="w-56">Objetivos</th>
+                <th class="w-56">Hipótesis</th>
+                <th class="w-48">Variables y dimensiones</th>
+                <th class="w-48">Metodología</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpoMatrizConsistenciaHtml"></tbody>
+          </table>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 no-imprimir">
+          <button type="button" onclick="irAPaso(3)" class="btn-secundario">
+            ← Anterior: Cuestionario Likert
+          </button>
+          <a href="#paso-1" onclick="irAPaso(1)" class="btn-azul">
+            Volver al inicio del formulario
+          </a>
+        </div>
+      </div>
+
+      <!-- Vista Previa Final Tipo Hoja de Documento -->
+      <div class="hoja-documento space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+          <div>
+            <h3 class="text-xl font-bold">Vista previa tipo documento de investigación</h3>
+            <p class="text-slate-600">Presentación consolidada lista para revisión académica o descarga en Word.</p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-sm font-semibold" style="background-color: var(--color-primario-claro); color: var(--color-primario);">
+            Formato de hoja
+          </span>
+        </div>
+        <div id="resumenHojaFinal" class="space-y-4 text-slate-800"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Contenedor de notificaciones tipo toast -->
+  <div id="toastContenedor" class="toast-contenedor no-imprimir" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ========================================================================
+       PIE DE PÁGINA COMPLETO (SIN BLOQUEOS DE COPIAR / CORTAR / CLIC DERECHO)
+       ======================================================================== -->
+  <footer class="mt-12 bg-white border-t border-slate-300 no-imprimir">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-slate-700">
+      <div>
+        <p class="font-bold text-slate-900">Generador de título, POH y tabla de operacionalización</p>
+        <p class="mt-1">Versión 2.4 · Año 2026</p>
+        <p class="mt-1">Hecho por: Estrada Domínguez Alimber</p>
+      </div>
+
+      <div>
+        <p class="font-bold text-slate-900">Soporte y consulta académica</p>
+        <p class="mt-1">Correo de soporte: soporte-metodologia@alimber.edu.pe</p>
+        <p class="mt-1">Institución de referencia: UNASAM</p>
+      </div>
+
+      <div>
+        <p class="font-bold text-slate-900">Privacidad y almacenamiento local</p>
+        <p class="mt-1">
+          Tus datos se procesan en tu navegador y no se envían a ningún servidor. El guardado automático emplea el almacenamiento local del navegador.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       LÓGICA METODOLÓGICA EXISTENTE (CONSERVADA SIN MODIFICAR FUNCIONES/IDS)
+       ======================================================================== -->
+  <script>
+    // Cambia esta constante por tu clave privada para habilitar el Modo Desarrollador
+    const CLAVE_DESARROLLADOR = 'CAMBIAR_ESTA_CLAVE';
+
+    const AUTORES = {
+      sampieri: {
+        nombre: 'H. Sampieri & Mendoza (2018)',
+        correlacional: {
+          conectorDefault: 'y su relación con',
+          pg: (v1, v2, ctx) => '¿De qué manera ' + v1 + ' se relaciona con ' + v2 + ' ' + ctx + '?',
+          pe: (dim, v2, ctx, idx) => [
+            '¿Cuál es la relación entre ' + dim + ' y ' + v2 + ' ' + ctx + '?',
+            '¿En qué medida ' + dim + ' se vincula con ' + v2 + ' ' + ctx + '?',
+            '¿Qué grado de relación existe entre ' + dim + ' y ' + v2 + ' ' + ctx + '?',
+            '¿Cómo se relaciona ' + dim + ' con ' + v2 + ' ' + ctx + '?'
+          ][idx % 4],
+          og: (v1, v2, ctx) => 'Determinar la relación entre ' + v1 + ' y ' + v2 + ' ' + ctx + '.',
+          oe: (dim, v2, ctx, idx) => [
+            'Establecer el vínculo existente entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Identificar el grado de relación entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Analizar la correspondencia entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Precisar la relación entre ' + dim + ' y ' + v2 + ' ' + ctx + '.'
+          ][idx % 4],
+          hg: (v1, v2, ctx) => 'Existe una relación significativa entre ' + v1 + ' y ' + v2 + ' ' + ctx + '.',
+          he: (dim, v2, ctx, idx) => [
+            capPrimera(dim) + ' se relaciona significativamente con ' + v2 + ' ' + ctx + '.',
+            'Se evidencia un vínculo directo y significativo entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' guarda relación positiva con ' + v2 + ' ' + ctx + '.',
+            'Existe correspondencia significativa entre ' + dim + ' y ' + v2 + ' ' + ctx + '.'
+          ][idx % 4]
+        },
+        explicativo: {
+          conectorDefault: 'y su influencia en',
+          pg: (v1, v2, ctx) => '¿De qué manera ' + v1 + ' influye en ' + v2 + ' ' + ctx + '?',
+          pe: (dim, v2, ctx, idx) => [
+            '¿En qué medida ' + dim + ' influye en ' + v2 + ' ' + ctx + '?',
+            '¿Cuál es el efecto de ' + dim + ' sobre ' + v2 + ' ' + ctx + '?',
+            '¿Cómo incide ' + dim + ' en ' + v2 + ' ' + ctx + '?',
+            '¿De qué forma ' + dim + ' repercute en ' + v2 + ' ' + ctx + '?'
+          ][idx % 4],
+          og: (v1, v2, ctx) => 'Determinar la influencia de ' + v1 + ' en ' + v2 + ' ' + ctx + '.',
+          oe: (dim, v2, ctx, idx) => [
+            'Evaluar el efecto que ejerce ' + dim + ' sobre ' + v2 + ' ' + ctx + '.',
+            'Analizar la incidencia de ' + dim + ' en ' + v2 + ' ' + ctx + '.',
+            'Establecer en qué medida ' + dim + ' repercute en ' + v2 + ' ' + ctx + '.',
+            'Identificar la influencia de ' + dim + ' sobre ' + v2 + ' ' + ctx + '.'
+          ][idx % 4],
+          hg: (v1, v2, ctx) => capPrimera(v1) + ' influye significativamente en ' + v2 + ' ' + ctx + '.',
+          he: (dim, v2, ctx, idx) => [
+            capPrimera(dim) + ' ejerce un efecto significativo sobre ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' incide de manera favorable y significativa en ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' repercute directamente en ' + v2 + ' ' + ctx + '.',
+            'Existe influencia significativa de ' + dim + ' sobre ' + v2 + ' ' + ctx + '.'
+          ][idx % 4]
+        }
+      },
+      varaHorna: {
+        nombre: 'A. Vara-Horna (2012)',
+        correlacional: {
+          conectorDefault: 'y su asociación con',
+          pg: (v1, v2, ctx) => '¿Cómo se asocia ' + v1 + ' con ' + v2 + ' ' + ctx + '?',
+          pe: (dim, v2, ctx, idx) => [
+            '¿Cuál es el nivel de asociación entre ' + dim + ' y ' + v2 + ' ' + ctx + '?',
+            '¿En qué grado se vincula ' + dim + ' con ' + v2 + ' ' + ctx + '?',
+            '¿Qué relación asociativa existe entre ' + dim + ' y ' + v2 + ' ' + ctx + '?',
+            '¿De qué modo se asocia ' + dim + ' con ' + v2 + ' ' + ctx + '?'
+          ][idx % 4],
+          og: (v1, v2, ctx) => 'Establecer la asociación entre ' + v1 + ' y ' + v2 + ' ' + ctx + '.',
+          oe: (dim, v2, ctx, idx) => [
+            'Determinar el nivel de asociación entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Analizar el vínculo existente entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Identificar la correspondencia entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Comprobar la asociación entre ' + dim + ' y ' + v2 + ' ' + ctx + '.'
+          ][idx % 4],
+          hg: (v1, v2, ctx) => capPrimera(v1) + ' se asocia directamente con ' + v2 + ' ' + ctx + '.',
+          he: (dim, v2, ctx, idx) => [
+            'Existe una asociación significativa entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' mantiene un vínculo directo con ' + v2 + ' ' + ctx + '.',
+            'Se comprueba una correspondencia positiva entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' se asocia favorablemente con ' + v2 + ' ' + ctx + '.'
+          ][idx % 4]
+        },
+        explicativo: {
+          conectorDefault: 'y su impacto en',
+          pg: (v1, v2, ctx) => '¿Cuál es el impacto de ' + v1 + ' sobre ' + v2 + ' ' + ctx + '?',
+          pe: (dim, v2, ctx, idx) => [
+            '¿En qué medida impacta ' + dim + ' en ' + v2 + ' ' + ctx + '?',
+            '¿Qué efectos produce ' + dim + ' sobre ' + v2 + ' ' + ctx + '?',
+            '¿Cómo repercute ' + dim + ' en ' + v2 + ' ' + ctx + '?',
+            '¿Cuál es la incidencia de ' + dim + ' sobre ' + v2 + ' ' + ctx + '?'
+          ][idx % 4],
+          og: (v1, v2, ctx) => 'Evaluar el impacto de ' + v1 + ' sobre ' + v2 + ' ' + ctx + '.',
+          oe: (dim, v2, ctx, idx) => [
+            'Determinar los efectos que produce ' + dim + ' sobre ' + v2 + ' ' + ctx + '.',
+            'Analizar la repercusión de ' + dim + ' en ' + v2 + ' ' + ctx + '.',
+            'Medir la incidencia de ' + dim + ' sobre ' + v2 + ' ' + ctx + '.',
+            'Establecer el impacto específico de ' + dim + ' en ' + v2 + ' ' + ctx + '.'
+          ][idx % 4],
+          hg: (v1, v2, ctx) => capPrimera(v1) + ' genera un impacto positivo y significativo sobre ' + v2 + ' ' + ctx + '.',
+          he: (dim, v2, ctx, idx) => [
+            capPrimera(dim) + ' produce efectos favorables y significativos sobre ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' repercute positivamente en ' + v2 + ' ' + ctx + '.',
+            'Existe una incidencia significativa de ' + dim + ' sobre ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' impacta directamente en ' + v2 + ' ' + ctx + '.'
+          ][idx % 4]
+        }
+      },
+      cesarVara: {
+        nombre: 'César Vara (2015)',
+        correlacional: {
+          conectorDefault: 'relacionado con',
+          pg: (v1, v2, ctx) => '¿Qué relación existe entre ' + v1 + ' y ' + v2 + ' ' + ctx + '?',
+          pe: (dim, v2, ctx, idx) => [
+            '¿Cómo se vincula ' + dim + ' con ' + v2 + ' ' + ctx + '?',
+            '¿Cuál es el grado de correspondencia entre ' + dim + ' y ' + v2 + ' ' + ctx + '?',
+            '¿En qué medida se relaciona ' + dim + ' con ' + v2 + ' ' + ctx + '?',
+            '¿Qué nivel de conexión existe entre ' + dim + ' y ' + v2 + ' ' + ctx + '?'
+          ][idx % 4],
+          og: (v1, v2, ctx) => 'Identificar la relación existente entre ' + v1 + ' y ' + v2 + ' ' + ctx + '.',
+          oe: (dim, v2, ctx, idx) => [
+            'Determinar el vínculo entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Establecer la correspondencia existente entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Analizar la relación de ' + dim + ' con ' + v2 + ' ' + ctx + '.',
+            'Precisar el grado de conexión entre ' + dim + ' y ' + v2 + ' ' + ctx + '.'
+          ][idx % 4],
+          hg: (v1, v2, ctx) => 'Existe relación directa y significativa entre ' + v1 + ' y ' + v2 + ' ' + ctx + '.',
+          he: (dim, v2, ctx, idx) => [
+            capPrimera(dim) + ' se vincula directamente con ' + v2 + ' ' + ctx + '.',
+            'Se observa una correspondencia significativa entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' presenta relación positiva con ' + v2 + ' ' + ctx + '.',
+            'Existe conexión directa entre ' + dim + ' y ' + v2 + ' ' + ctx + '.'
+          ][idx % 4]
+        },
+        explicativo: {
+          conectorDefault: 'como factor determinante en',
+          pg: (v1, v2, ctx) => '¿En qué grado ' + v1 + ' determina ' + v2 + ' ' + ctx + '?',
+          pe: (dim, v2, ctx, idx) => [
+            '¿Cómo condiciona ' + dim + ' a ' + v2 + ' ' + ctx + '?',
+            '¿En qué medida influye ' + dim + ' sobre ' + v2 + ' ' + ctx + '?',
+            '¿Cuál es el efecto determinante de ' + dim + ' en ' + v2 + ' ' + ctx + '?',
+            '¿De qué manera incide ' + dim + ' en ' + v2 + ' ' + ctx + '?'
+          ][idx % 4],
+          og: (v1, v2, ctx) => 'Analizar en qué grado ' + v1 + ' determina ' + v2 + ' ' + ctx + '.',
+          oe: (dim, v2, ctx, idx) => [
+            'Determinar cómo condiciona ' + dim + ' a ' + v2 + ' ' + ctx + '.',
+            'Evaluar la influencia de ' + dim + ' sobre ' + v2 + ' ' + ctx + '.',
+            'Establecer el efecto de ' + dim + ' en ' + v2 + ' ' + ctx + '.',
+            'Identificar la incidencia de ' + dim + ' sobre ' + v2 + ' ' + ctx + '.'
+          ][idx % 4],
+          hg: (v1, v2, ctx) => capPrimera(v1) + ' determina significativamente ' + v2 + ' ' + ctx + '.',
+          he: (dim, v2, ctx, idx) => [
+            capPrimera(dim) + ' condiciona favorablemente a ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' ejerce influencia significativa sobre ' + v2 + ' ' + ctx + '.',
+            'Se evidencia un efecto determinante de ' + dim + ' en ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' incide directamente en ' + v2 + ' ' + ctx + '.'
+          ][idx % 4]
+        }
+      },
+      villanueva: {
+        nombre: 'L. Villanueva (2018 - UNASAM)',
+        correlacional: {
+          conectorDefault: 'y su correlación con',
+          pg: (v1, v2, ctx) => '¿Cuál es el grado de correlación entre ' + v1 + ' y ' + v2 + ' ' + ctx + '?',
+          pe: (dim, v2, ctx, idx) => [
+            '¿Cómo se correlaciona ' + dim + ' con ' + v2 + ' ' + ctx + '?',
+            '¿Qué nivel de relación existe entre ' + dim + ' y ' + v2 + ' ' + ctx + '?',
+            '¿En qué medida ' + dim + ' guarda correlación con ' + v2 + ' ' + ctx + '?',
+            '¿Cuál es el vínculo entre ' + dim + ' y ' + v2 + ' ' + ctx + '?'
+          ][idx % 4],
+          og: (v1, v2, ctx) => 'Determinar el grado de correlación entre ' + v1 + ' y ' + v2 + ' ' + ctx + '.',
+          oe: (dim, v2, ctx, idx) => [
+            'Establecer la correlación existente entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Identificar el nivel de relación entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Analizar la vinculación entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Precisar el grado de asociación entre ' + dim + ' y ' + v2 + ' ' + ctx + '.'
+          ][idx % 4],
+          hg: (v1, v2, ctx) => 'Existe un alto grado de correlación positiva entre ' + v1 + ' y ' + v2 + ' ' + ctx + '.',
+          he: (dim, v2, ctx, idx) => [
+            capPrimera(dim) + ' se correlaciona positiva y significativamente con ' + v2 + ' ' + ctx + '.',
+            'Se evidencia una relación directa entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            'Existe vinculación significativa entre ' + dim + ' y ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' guarda asociación favorable con ' + v2 + ' ' + ctx + '.'
+          ][idx % 4]
+        },
+        explicativo: {
+          conectorDefault: 'y su incidencia en',
+          pg: (v1, v2, ctx) => '¿En qué medida ' + v1 + ' incide en ' + v2 + ' ' + ctx + '?',
+          pe: (dim, v2, ctx, idx) => [
+            '¿De qué manera influye ' + dim + ' en ' + v2 + ' ' + ctx + '?',
+            '¿Cuál es el efecto de ' + dim + ' sobre ' + v2 + ' ' + ctx + '?',
+            '¿Cómo repercute ' + dim + ' en ' + v2 + ' ' + ctx + '?',
+            '¿Qué grado de incidencia ejerce ' + dim + ' en ' + v2 + ' ' + ctx + '?'
+          ][idx % 4],
+          og: (v1, v2, ctx) => 'Determinar en qué medida ' + v1 + ' incide en ' + v2 + ' ' + ctx + '.',
+          oe: (dim, v2, ctx, idx) => [
+            'Analizar la influencia de ' + dim + ' en ' + v2 + ' ' + ctx + '.',
+            'Evaluar el efecto que genera ' + dim + ' sobre ' + v2 + ' ' + ctx + '.',
+            'Establecer la repercusión de ' + dim + ' en ' + v2 + ' ' + ctx + '.',
+            'Identificar el grado de incidencia de ' + dim + ' en ' + v2 + ' ' + ctx + '.'
+          ][idx % 4],
+          hg: (v1, v2, ctx) => capPrimera(v1) + ' incide favorable y significativamente en ' + v2 + ' ' + ctx + '.',
+          he: (dim, v2, ctx, idx) => [
+            capPrimera(dim) + ' influye favorablemente en ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' genera un efecto positivo y significativo sobre ' + v2 + ' ' + ctx + '.',
+            'Existe repercusión directa de ' + dim + ' en ' + v2 + ' ' + ctx + '.',
+            capPrimera(dim) + ' incide significativamente en ' + v2 + ' ' + ctx + '.'
+          ][idx % 4]
+        }
+      }
+    };
+
+    const ESCALAS = {
+      frecuencia: { nombre: 'Frecuencia (Nunca – Siempre)', opciones: ['1. Nunca', '2. Casi nunca', '3. A veces', '4. Casi siempre', '5. Siempre'] },
+      acuerdo: { nombre: 'Acuerdo (Totalmente en desacuerdo – Totalmente de acuerdo)', opciones: ['1. Totalmente en desacuerdo', '2. En desacuerdo', '3. Ni de acuerdo ni en desacuerdo', '4. De acuerdo', '5. Totalmente de acuerdo'] },
+      calidad: { nombre: 'Valoración / Calidad (Muy malo – Muy bueno)', opciones: ['1. Muy malo', '2. Malo', '3. Regular', '4. Bueno', '5. Muy bueno'] },
+      satisfaccion: { nombre: 'Satisfacción (Muy insatisfecho – Muy satisfecho)', opciones: ['1. Muy insatisfecho', '2. Insatisfecho', '3. Neutral', '4. Satisfecho', '5. Muy satisfecho'] }
+    };
+
+    let state = {
+      varsExtra: [],
+      dimsV1: ['', ''],
+      indsV1: [['', '', ''], ['', '', '']],
+      dimsV2: ['', ''],
+      indsV2: [['', '', ''], ['', '', '']]
+    };
+
+    function capPrimera(t) {
+      if (!t) return '';
+      const s = t.trim();
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function capOracion(t) {
+      if (!t) return '';
+      return t.trim().split(/\s+/).map((p, idx) => {
+        if (p === p.toUpperCase() && p.length > 1) return p;
+        return idx === 0 ? p.charAt(0).toUpperCase() + p.slice(1).toLowerCase() : p.toLowerCase();
+      }).join(' ');
+    }
+
+    function normMinuscula(t) {
+      if (!t) return '';
+      return t.trim().split(/\s+/).map(p => (p === p.toUpperCase() && p.length > 1 ? p : p.toLowerCase())).join(' ');
+    }
+
+    function detectarArt(frase) {
+      const limpio = normMinuscula(frase);
+      if (!limpio) return '';
+      if (/^(el|la|los|las|un|una|unos|unas)\b/i.test(limpio)) return limpio;
+      const primera = limpio.split(/\s+/)[0].replace(/[^a-záéíóúñ]/gi, '');
+      const femPl = ['trabajadoras','colaboradoras','docentes','enfermeras','empresas','instituciones','organizaciones','estudiantes','personas','familias','autoridades'];
+      const mascPl = ['trabajadores','colaboradores','empleados','usuarios','clientes','ciudadanos','funcionarios','directivos','operarios','pacientes','alumnos'];
+      const fem = ['gestion','gestión','calidad','productividad','motivacion','motivación','satisfaccion','satisfacción','capacitacion','capacitación','comunicacion','comunicación','innovacion','innovación','rentabilidad','liquidez','eficiencia','eficacia','competitividad','actitud','cultura','imagen','atencion','atención','coordinacion','coordinación'];
+      const masc = ['clima','sistema','programa','desempeno','desempeño','liderazgo','compromiso','control','proceso','servicio','talento','estres','estrés','analisis','análisis','marketing','coaching','distrito'];
+      if (femPl.includes(primera)) return 'las ' + limpio;
+      if (mascPl.includes(primera)) return 'los ' + limpio;
+      if (masc.includes(primera)) return 'el ' + limpio;
+      if (fem.includes(primera) || primera.endsWith('ción') || primera.endsWith('sión') || primera.endsWith('dad') || primera.endsWith('tad')) return 'la ' + limpio;
+      if (primera.endsWith('as')) return 'las ' + limpio;
+      if (primera.endsWith('os') || primera.endsWith('es')) return 'los ' + limpio;
+      if (primera.endsWith('a')) return 'la ' + limpio;
+      return 'el ' + limpio;
+    }
+
+    function formatearOrgHtml(conectorOrg, orgTrim) {
+      if (!orgTrim) return '';
+      if (conectorOrg && conectorOrg !== 'auto') {
+        return conectorOrg + ' ' + orgTrim;
+      }
+      const low = orgTrim.toLowerCase();
+      if (/^(la|el|los|las)\b/i.test(low)) return 'de ' + orgTrim;
+      if (/^(hospital|banco|ministerio|gobierno|instituto|colegio|centro|comedor|programa|proyecto|estudio|taller|mercado|hotel|restaurante)\b/i.test(low)) {
+        return 'del ' + orgTrim;
+      }
+      if (/^(universidad|municipalidad|empresa|institución|institucion|clínica|clinica|red|dirección|direccion|gerencia|subgerencia|oficina|área|area|unidad|cooperativa|asociación|asociacion|caja|financiera|unasam|sunat|essalud|ugel|drea)\b/i.test(low)) {
+        return 'de la ' + orgTrim;
+      }
+      if (orgTrim === orgTrim.toUpperCase() && orgTrim.length > 1) {
+        return 'de la ' + orgTrim;
+      }
+      return 'de la empresa ' + orgTrim;
+    }
+
+    function formatearCtxHtml(pob, conectorOrg, org, lug, anio) {
+      const partes = [];
+      if (pob) partes.push('en ' + detectarArt(pob));
+      if (org) partes.push(formatearOrgHtml(conectorOrg, org));
+      if (lug) partes.push(/^(distrito|provincia|región|region|ciudad)\b/i.test(lug) ? 'en el ' + lug : 'en ' + lug);
+      if (anio) partes.push(anio);
+      return limpiarContr(partes.join(', ')) || '[contexto y año]';
+    }
+
+    function limpiarContr(s) {
+      return s.replace(/\bde el\b/g, 'del').replace(/\ba el\b/g, 'al').replace(/\s+/g, ' ').trim();
+    }
+
+    // Determina el género gramatical aproximado de una frase nominal en español
+    function detectarGeneroFrase(frase) {
+      const limpio = normMinuscula(frase).replace(/^(el|la|los|las|un|una|unos|unas)\s+/i, '').trim();
+      if (!limpio) return 'm';
+      const primera = limpio.split(/\s+/)[0].replace(/[^a-záéíóúñ]/gi, '');
+      const fem = [
+        'gestion', 'gestión', 'calidad', 'productividad', 'motivacion', 'motivación',
+        'satisfaccion', 'satisfacción', 'capacitacion', 'capacitación', 'comunicacion', 'comunicación',
+        'innovacion', 'innovación', 'rentabilidad', 'liquidez', 'eficiencia', 'eficacia',
+        'competitividad', 'actitud', 'cultura', 'imagen', 'atencion', 'atención',
+        'coordinacion', 'coordinación', 'relacion', 'relación', 'asociacion', 'asociación',
+        'correlacion', 'correlación', 'influencia', 'incidencia', 'repercusion', 'repercusión',
+        'comunicacion', 'comunicación', 'informacion', 'información', 'responsabilidad',
+        'adaptabilidad', 'precision', 'precisión', 'orientacion', 'orientación', 'resolucion', 'resolución'
+      ];
+      const masc = [
+        'clima', 'sistema', 'programa', 'desempeno', 'desempeño', 'liderazgo',
+        'compromiso', 'control', 'proceso', 'servicio', 'talento', 'estres', 'estrés',
+        'analisis', 'análisis', 'marketing', 'coaching', 'impacto', 'efecto', 'nivel',
+        'grado', 'vinculo', 'vínculo', 'aporte', 'uso', 'cumplimiento', 'trabajo'
+      ];
+      if (masc.includes(primera)) return 'm';
+      if (
+        fem.includes(primera) ||
+        primera.endsWith('ción') ||
+        primera.endsWith('sión') ||
+        primera.endsWith('dad') ||
+        primera.endsWith('tad') ||
+        primera.endsWith('a')
+      ) {
+        return 'f';
+      }
+      return 'm';
+    }
+
+    // Genera un conector gramatical y temáticamente coherente entre V1 y V2
+    function calcularConectorAutomaticoHtml(autor, alcance, v1Texto, v2Texto) {
+      const generoV2 = detectarGeneroFrase(v2Texto);
+      const prepDestino = generoV2 === 'f' ? 'en la' : 'en el';
+      const prepSobre = generoV2 === 'f' ? 'sobre la' : 'sobre el';
+      const prepCon = generoV2 === 'f' ? 'con la' : 'con el';
+
+      if (alcance === 'correlacional') {
+        if (autor === 'villanueva') return `y su correlación ${prepCon}`;
+        if (autor === 'varaHorna') return `y su asociación ${prepCon}`;
+        if (autor === 'cesarVara') return `vinculado ${prepCon}`;
+        return `y su relación ${prepCon}`;
+      }
+
+      if (autor === 'varaHorna') return `y su impacto ${prepSobre}`;
+      if (autor === 'cesarVara') return `como factor determinante ${prepDestino}`;
+      if (autor === 'villanueva') return `y su incidencia ${prepDestino}`;
+      return `y su influencia ${prepDestino}`;
+    }
+
+    // Ajusta el selector de conector automáticamente salvo que el usuario haya elegido una opción distinta manualmente
+    let conectorEditadoManualmente = false;
+
+    function alCambiarConectorManualHtml() {
+      const selCon = document.getElementById('conectorHtml');
+      const autor = document.getElementById('autorHtml')?.value || 'sampieri';
+      const alcance = document.getElementById('alcanceHtml')?.value || 'correlacional';
+      const v1Texto = document.getElementById('v1Html')?.value || '';
+      const v2Texto = document.getElementById('v2Html')?.value || '';
+      const autoSugerido = calcularConectorAutomaticoHtml(autor, alcance, v1Texto, v2Texto);
+      conectorEditadoManualmente = Boolean(selCon && selCon.value && selCon.value !== autoSugerido);
+    }
+
+    function sincronizarConectorAutomaticoHtml() {
+      const selCon = document.getElementById('conectorHtml');
+      if (!selCon) return;
+      const autor = document.getElementById('autorHtml')?.value || 'sampieri';
+      const alcance = document.getElementById('alcanceHtml')?.value || 'correlacional';
+      const v1Texto = document.getElementById('v1Html')?.value || '';
+      const v2Texto = document.getElementById('v2Html')?.value || '';
+      const sugerido = calcularConectorAutomaticoHtml(autor, alcance, v1Texto, v2Texto);
+
+      if (!conectorEditadoManualmente) {
+        const existeOpcion = Array.from(selCon.options).some((opt) => opt.value === sugerido);
+        if (!existeOpcion && sugerido) {
+          const nuevaOpt = document.createElement('option');
+          nuevaOpt.value = sugerido;
+          nuevaOpt.textContent = `... ${sugerido}`;
+          selCon.insertBefore(nuevaOpt, selCon.firstChild);
+        }
+        selCon.value = sugerido;
+      }
+    }
+
+    // Formatea un fragmento de lugar evitando duplicar preposiciones o artículos como "del distrito de..."
+    function formatearLugarTituloHtml(lugTrim) {
+      if (!lugTrim) return '';
+      const limpio = lugTrim.trim();
+      if (/^(en|de|del|de la|de los|de las)\b/i.test(limpio)) {
+        return limpio;
+      }
+      if (/^distrito\s+de\b/i.test(limpio)) {
+        return `del ${limpio}`;
+      }
+      if (/^(provincia|región|region)\s+de\b/i.test(limpio)) {
+        return `de la ${limpio}`;
+      }
+      if (/^(distrito|provincia|región|region|ciudad)\b/i.test(limpio)) {
+        return `del ${limpio}`;
+      }
+      return `de ${limpio}`;
+    }
+
+    function formatearLugarContextoHtml(lugTrim) {
+      if (!lugTrim) return '';
+      const limpio = lugTrim.trim();
+      if (/^(en|de|del|de la|de los|de las)\b/i.test(limpio)) {
+        return limpio;
+      }
+      if (/^distrito\s+de\b/i.test(limpio)) {
+        return `en el ${limpio}`;
+      }
+      if (/^(provincia|región|region)\s+de\b/i.test(limpio)) {
+        return `en la ${limpio}`;
+      }
+      if (/^(distrito|provincia|región|region|ciudad)\b/i.test(limpio)) {
+        return `en el ${limpio}`;
+      }
+      return `en ${limpio}`;
+    }
+
+    function indAItem(indTexto, idx) {
+      const limpio = indTexto.trim().replace(/\.$/, '');
+      if (!limpio) return '';
+      const low = limpio.toLowerCase();
+      if (low.includes('eficiencia')) return 'Optimizo el uso de tiempo y recursos en mis labores diarias.';
+      if (low.includes('eficacia')) return 'Alcanzo los objetivos establecidos en los plazos previstos.';
+      if (low.includes('productividad')) return 'Mantengo un nivel elevado de rendimiento durante mi jornada.';
+      if (low.includes('claridad') && low.includes('objetivo')) return 'Comprendo con claridad los objetivos asignados a mi puesto.';
+      if (low.includes('puntualidad') || low.includes('asistencia')) return 'Cumplo puntualmente con mi horario y asistencia laboral.';
+      if (low.includes('trabajo en equipo')) return 'Colaboro activamente con mis compañeros para lograr metas comunes.';
+      if (low.includes('comunicación') || low.includes('comunicacion')) return 'Expreso mis ideas de forma clara y oportuna en mi entorno laboral.';
+      if (low.includes('resolución de problemas') || low.includes('resolucion de problemas')) return 'Resuelvo de manera efectiva los inconvenientes que surgen en mi trabajo.';
+      if (low.includes('adaptabilidad') || low.includes('cambio')) return 'Me adapto con facilidad a los nuevos retos y cambios organizacionales.';
+      if (low.includes('compromiso')) return 'Asumo con responsabilidad y compromiso las metas de la institución.';
+      if (low.includes('motivación') || low.includes('motivacion')) return 'Me siento motivado para mejorar continuamente mi desempeño profesional.';
+      if (low.includes('liderazgo')) return 'Oriento y apoyo a mi equipo para cumplir las actividades programadas.';
+      if (low.includes('capacitación') || low.includes('capacitacion') || low.includes('aprendizaje')) return 'Aplico los conocimientos adquiridos en mis capacitaciones para mejorar mi labor.';
+
+      const plantillas = [
+        i => 'Aplico criterios adecuados de ' + i + ' en mis funciones habituales.',
+        i => 'Gestiono de forma oportuna ' + detectarArt(i) + ' dentro de mi área.',
+        i => 'Mantengo un adecuado nivel de ' + i + ' en cada tarea asignada.',
+        i => 'Priorizo ' + detectarArt(i) + ' para asegurar resultados de calidad.',
+        i => 'Integro prácticas efectivas de ' + i + ' en mi desempeño cotidiano.',
+        i => 'Fortalezco constantemente ' + detectarArt(i) + ' en mis actividades.',
+        i => 'Ejecuto mis responsabilidades evidenciando ' + i + ' en el trabajo.',
+        i => 'Evalúo periódicamente ' + detectarArt(i) + ' para optimizar mi labor.'
+      ];
+      return limpiarContr(plantillas[idx % plantillas.length](low));
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function alCambiarAlcanceHtml() {
+      const alcance = document.getElementById('alcanceHtml').value;
+      const autor = document.getElementById('autorHtml').value;
+      const selPref = document.getElementById('prefijoHtml');
+      const selCon = document.getElementById('conectorHtml');
+      const v1Texto = document.getElementById('v1Html')?.value || '';
+      const v2Texto = document.getElementById('v2Html')?.value || '';
+
+      if (alcance === 'correlacional') {
+        selPref.innerHTML = '<option value="">(Ninguno / Directo)</option><option value="Relación entre">Relación entre...</option><option value="Correlación entre">Correlación entre...</option><option value="Asociación entre">Asociación entre...</option>';
+        selCon.innerHTML =
+          '<option value="y su relación con el">... y su relación con el</option>' +
+          '<option value="y su relación con la">... y su relación con la</option>' +
+          '<option value="y su correlación con el">... y su correlación con el</option>' +
+          '<option value="y su correlación con la">... y su correlación con la</option>' +
+          '<option value="y su asociación con el">... y su asociación con el</option>' +
+          '<option value="y su asociación con la">... y su asociación con la</option>' +
+          '<option value="vinculado con el">... vinculado con el</option>' +
+          '<option value="vinculada con la">... vinculada con la</option>' +
+          '<option value="y">... y</option>';
+      } else {
+        selPref.innerHTML = '<option value="">(Ninguno / Directo)</option><option value="Influencia de">Influencia de...</option><option value="Impacto de">Impacto de...</option><option value="Efecto de">Efecto de...</option><option value="Incidencia de">Incidencia de...</option>';
+        selCon.innerHTML =
+          '<option value="y su influencia en el">... y su influencia en el</option>' +
+          '<option value="y su influencia en la">... y su influencia en la</option>' +
+          '<option value="y su impacto sobre el">... y su impacto sobre el</option>' +
+          '<option value="y su impacto sobre la">... y su impacto sobre la</option>' +
+          '<option value="y su efecto sobre el">... y su efecto sobre el</option>' +
+          '<option value="y su efecto sobre la">... y su efecto sobre la</option>' +
+          '<option value="como factor determinante en el">... como factor determinante en el</option>' +
+          '<option value="como factor determinante en la">... como factor determinante en la</option>' +
+          '<option value="y su incidencia en el">... y su incidencia en el</option>' +
+          '<option value="y su incidencia en la">... y su incidencia en la</option>';
+      }
+      conectorEditadoManualmente = false;
+      const autoCon = calcularConectorAutomaticoHtml(autor, alcance, v1Texto, v2Texto);
+      selCon.value = Array.from(selCon.options).some((o) => o.value === autoCon)
+        ? autoCon
+        : AUTORES[autor][alcance].conectorDefault;
+      renderizarTodoHtml();
+    }
+
+    function alCambiarAutorHtml() {
+      conectorEditadoManualmente = false;
+      sincronizarConectorAutomaticoHtml();
+      renderizarTodoHtml();
+    }
+
+    function toggleMultivariadaHtml() {
+      const dis = document.getElementById('disenoHtml').value;
+      const bloque = document.getElementById('bloqueExtrasHtml');
+      if (dis === 'multivariada') {
+        bloque.classList.remove('hidden');
+      } else {
+        bloque.classList.add('hidden');
+      }
+      renderizarTodoHtml();
+    }
+
+    function agregarVarExtraHtml() {
+      state.varsExtra.push('');
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+    }
+
+    function agregarDimV1Html() {
+      state.dimsV1.push('');
+      state.indsV1.push(['', '', '']);
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+    }
+
+    function eliminarDimV1Html(idx) {
+      if (state.dimsV1.length <= 1) return;
+      state.dimsV1.splice(idx, 1);
+      state.indsV1.splice(idx, 1);
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+    }
+
+    function agregarIndV1Html(dIdx) {
+      if (state.indsV1[dIdx].length >= 4) return;
+      state.indsV1[dIdx].push('');
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+    }
+
+    function agregarDimV2Html() {
+      state.dimsV2.push('');
+      state.indsV2.push(['', '', '']);
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+    }
+
+    function eliminarDimV2Html(idx) {
+      if (state.dimsV2.length <= 1) return;
+      state.dimsV2.splice(idx, 1);
+      state.indsV2.splice(idx, 1);
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+    }
+
+    function agregarIndV2Html(dIdx) {
+      if (state.indsV2[dIdx].length >= 4) return;
+      state.indsV2[dIdx].push('');
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+    }
+
+    function dibujarControlesDinamicosHtml() {
+      const contExtra = document.getElementById('listaVarsExtraHtml');
+      contExtra.innerHTML = state.varsExtra.map((vx, i) =>
+        '<div class="flex gap-2"><input type="text" value="' + escHtml(vx) + '" oninput="state.varsExtra[' + i + ']=this.value; renderizarTodoHtml(); guardarEstadoLocal();" placeholder="Variable adicional ' + (i + 1) + '" class="flex-1" />' +
+        '<button type="button" onclick="state.varsExtra.splice(' + i + ',1); dibujarControlesDinamicosHtml(); renderizarTodoHtml(); guardarEstadoLocal();" class="btn-secundario" aria-label="Eliminar variable adicional">✕</button></div>'
+      ).join('');
+
+      const contDimsV1 = document.getElementById('contenedorDimsV1Html');
+      contDimsV1.innerHTML = state.dimsV1.map((d, i) =>
+        '<div class="flex items-center gap-2">' +
+        '<input id="dimV1Input_' + i + '" type="text" value="' + escHtml(d) + '" oninput="limpiarErrorHtml(this); ocultarErrorCampo(\'err-dimsV1\'); state.dimsV1[' + i + ']=this.value; dibujarConfigIndicadoresSoloTexto(); renderizarTodoHtml(); guardarEstadoLocal();" placeholder="Dimensión ' + (i + 1) + ' de V1" class="flex-1" />' +
+        (state.dimsV1.length > 1 ? '<button type="button" onclick="eliminarDimV1Html(' + i + '); guardarEstadoLocal();" class="btn-secundario" aria-label="Eliminar dimensión ' + (i + 1) + ' de V1">✕</button>' : '') +
+        '</div>'
+      ).join('');
+
+      const contDimsV2 = document.getElementById('contenedorDimsV2Html');
+      if (contDimsV2) {
+        contDimsV2.innerHTML = state.dimsV2.map((d, i) =>
+          '<div class="flex items-center gap-2">' +
+          '<input id="dimV2Input_' + i + '" type="text" value="' + escHtml(d) + '" oninput="limpiarErrorHtml(this); ocultarErrorCampo(\'err-dimsV2\'); state.dimsV2[' + i + ']=this.value; dibujarConfigIndicadoresSoloTexto(); renderizarTodoHtml(); guardarEstadoLocal();" placeholder="Dimensión ' + (i + 1) + ' de V2" class="flex-1" />' +
+          (state.dimsV2.length > 1 ? '<button type="button" onclick="eliminarDimV2Html(' + i + '); guardarEstadoLocal();" class="btn-secundario" aria-label="Eliminar dimensión ' + (i + 1) + ' de V2">✕</button>' : '') +
+          '</div>'
+        ).join('');
+      }
+
+      const cfgV1 = document.getElementById('configIndicadoresV1Html');
+      cfgV1.innerHTML = state.dimsV1.map((d, dIdx) => {
+        const inds = state.indsV1[dIdx] || ['', '', ''];
+        return '<div class="bg-white p-4 rounded-xl border border-slate-300 space-y-3">' +
+          '<div class="flex flex-wrap justify-between items-center gap-2">' +
+          '<span id="lblDimV1_' + dIdx + '" class="font-bold text-slate-900">Dimensión ' + (dIdx + 1) + ': ' + escHtml(d.trim() || '(Sin nombre)') + '</span>' +
+          (inds.length < 4 ? '<button type="button" onclick="agregarIndV1Html(' + dIdx + '); guardarEstadoLocal();" class="btn-secundario">+ 4.º indicador</button>' : '') +
+          '</div>' +
+          '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">' +
+          inds.map((ind, iIdx) =>
+            '<input type="text" value="' + escHtml(ind) + '" oninput="state.indsV1[' + dIdx + '][' + iIdx + ']=this.value; renderizarTodoHtml(); guardarEstadoLocal();" placeholder="Indicador ' + (dIdx + 1) + '.' + (iIdx + 1) + '" />'
+          ).join('') +
+          '</div></div>';
+      }).join('');
+
+      const cfgV2 = document.getElementById('configIndicadoresV2Html');
+      cfgV2.innerHTML = state.dimsV2.map((d, dIdx) => {
+        const inds = state.indsV2[dIdx] || ['', '', ''];
+        return '<div class="bg-white p-4 rounded-xl border border-slate-300 space-y-3">' +
+          '<div class="flex flex-wrap items-center gap-2">' +
+          '<input id="dimV2CfgInput_' + dIdx + '" type="text" value="' + escHtml(d) + '" oninput="state.dimsV2[' + dIdx + ']=this.value; sincronizarInputV2Paso1(' + dIdx + ', this.value); renderizarTodoHtml(); guardarEstadoLocal();" placeholder="Nombre dimensión ' + (dIdx + 1) + ' de V2" class="flex-1 font-semibold" />' +
+          (inds.length < 4 ? '<button type="button" onclick="agregarIndV2Html(' + dIdx + '); guardarEstadoLocal();" class="btn-secundario">+ 4.º ind.</button>' : '') +
+          (state.dimsV2.length > 1 ? '<button type="button" onclick="eliminarDimV2Html(' + dIdx + '); guardarEstadoLocal();" class="btn-secundario" aria-label="Eliminar dimensión de V2">✕</button>' : '') +
+          '</div>' +
+          '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">' +
+          inds.map((ind, iIdx) =>
+            '<input type="text" value="' + escHtml(ind) + '" oninput="state.indsV2[' + dIdx + '][' + iIdx + ']=this.value; renderizarTodoHtml(); guardarEstadoLocal();" placeholder="Indicador ' + (dIdx + 1) + '.' + (iIdx + 1) + '" />'
+          ).join('') +
+          '</div></div>';
+      }).join('');
+    }
+
+    function sincronizarInputV2Paso1(idx, valor) {
+      const el = document.getElementById('dimV2Input_' + idx);
+      if (el && document.activeElement !== el) el.value = valor;
+    }
+
+    function dibujarConfigIndicadoresSoloTexto() {
+      state.dimsV1.forEach((d, dIdx) => {
+        const el = document.getElementById('lblDimV1_' + dIdx);
+        if (el) el.innerText = 'Dimensión ' + (dIdx + 1) + ': ' + (d.trim() || '(Sin nombre)');
+      });
+      state.dimsV2.forEach((d, dIdx) => {
+        const el = document.getElementById('dimV2CfgInput_' + dIdx);
+        if (el && document.activeElement !== el) el.value = d;
+      });
+    }
+
+    function limpiarErrorHtml(el) {
+      el.classList.remove('border-red-500', 'bg-red-50');
+    }
+
+    function obtenerDatosCalculadosHtml() {
+      const autorKey = document.getElementById('autorHtml').value;
+      const alcance = document.getElementById('alcanceHtml').value;
+      const diseno = document.getElementById('disenoHtml').value;
+      const prefijo = document.getElementById('prefijoHtml').value;
+      const conector = document.getElementById('conectorHtml').value;
+      const v1 = document.getElementById('v1Html').value.trim();
+      const v2 = document.getElementById('v2Html').value.trim();
+      const conectorOrg = document.getElementById('conectorOrgHtml').value;
+      const org = document.getElementById('orgHtml').value.trim();
+      const pob = document.getElementById('pobHtml').value.trim();
+      const lug = document.getElementById('lugHtml').value.trim();
+      const anio = document.getElementById('anioHtml').value.trim();
+      const defV1 = document.getElementById('defV1Html').value.trim();
+      const defV2 = document.getElementById('defV2Html').value.trim();
+
+      const cfg = AUTORES[autorKey][alcance];
+      const v1Art = v1 ? detectarArt(v1) : '[variable 1]';
+      const v2Art = v2 ? detectarArt(v2) : '[variable 2]';
+      const v2SinArt = v2 ? normMinuscula(v2).replace(/^(el|la|los|las|un|una|unos|unas)\s+/i, '').trim() : '[variable 2]';
+
+      const partesCtx = [];
+      if (pob) partesCtx.push('en ' + detectarArt(pob));
+      if (org) partesCtx.push(formatearOrgHtml(conectorOrg, org));
+      if (lug) partesCtx.push(formatearLugarContextoHtml(lug));
+      if (anio) partesCtx.push(anio);
+      const contexto = limpiarContr(partesCtx.join(', ')) || '[contexto y año]';
+
+      let titulo = '';
+      if (v1 || v2) {
+        const p1 = v1 ? (prefijo ? prefijo + ' ' + normMinuscula(v1) : v1) : '[Variable 1]';
+        let p2 = '';
+        if (v2) {
+          if (prefijo.startsWith('Relación') || prefijo.startsWith('Correlación') || prefijo.startsWith('Asociación')) {
+            p2 = 'y ' + normMinuscula(v2);
+          } else if (/\b(el|la|los|las)$/i.test(conector.trim())) {
+            p2 = conector.trim() + ' ' + v2SinArt;
+          } else {
+            p2 = conector.trim() + ' ' + normMinuscula(v2);
+          }
+        }
+        const extras = diseno === 'multivariada'
+          ? state.varsExtra.filter(x => x.trim() !== '').map(x => ', ' + normMinuscula(x)).join('')
+          : '';
+        const partesTit = [p1 + extras, p2];
+        if (pob) partesTit.push('en ' + detectarArt(pob));
+        if (org) partesTit.push(formatearOrgHtml(conectorOrg, org));
+        if (lug) partesTit.push(formatearLugarTituloHtml(lug));
+        let baseTit = limpiarContr(partesTit.filter(Boolean).join(' '));
+        if (anio) {
+          baseTit = baseTit ? baseTit + ', ' + anio : anio;
+        }
+        titulo = capPrimera(baseTit).replace(/[.,;:\s]+$/, '');
+      }
+
+      const pg = limpiarContr(cfg.pg(v1Art, v2Art, contexto));
+      const og = limpiarContr(cfg.og(v1Art, v2Art, contexto));
+      const hg = limpiarContr(cfg.hg(v1Art, v2Art, contexto));
+
+      const dimsValidas = state.dimsV1.map((d, idx) => d.trim() ? d.trim() : 'dimensión ' + (idx + 1));
+      const pes = dimsValidas.map((dim, idx) => ({ id: 'PE' + (idx + 1), texto: limpiarContr(cfg.pe(detectarArt(dim), v2Art, contexto, idx)) }));
+      const oes = dimsValidas.map((dim, idx) => ({ id: 'OE' + (idx + 1), texto: limpiarContr(cfg.oe(detectarArt(dim), v2Art, contexto, idx)) }));
+      const hes = dimsValidas.map((dim, idx) => ({ id: 'HE' + (idx + 1), texto: limpiarContr(cfg.he(detectarArt(dim), v2Art, contexto, idx)) }));
+
+      let numItem = 0;
+      const opDimsV1 = state.dimsV1.map((d, dIdx) => {
+        const nombreDim = d.trim() ? capOracion(d) : 'Dimensión ' + (dIdx + 1) + ' (V1)';
+        const inds = (state.indsV1[dIdx] || ['', '', '']).map((ind, iIdx) => {
+          const tInd = ind.trim() ? capOracion(ind) : 'Indicador ' + (dIdx + 1) + '.' + (iIdx + 1);
+          const tItem = ind.trim() ? indAItem(ind, numItem) : 'Complete el indicador ' + (dIdx + 1) + '.' + (iIdx + 1) + ' para generar el ítem en primera persona.';
+          numItem++;
+          return { numero: numItem, indicador: tInd, item: tItem };
+        });
+        return { nombre: nombreDim, indicadores: inds };
+      });
+
+      const opDimsV2 = state.dimsV2.map((d, dIdx) => {
+        const nombreDim = d.trim() ? capOracion(d) : 'Dimensión ' + (dIdx + 1) + ' (V2)';
+        const inds = (state.indsV2[dIdx] || ['', '', '']).map((ind, iIdx) => {
+          const tInd = ind.trim() ? capOracion(ind) : 'Indicador ' + (dIdx + 1) + '.' + (iIdx + 1);
+          const tItem = ind.trim() ? indAItem(ind, numItem) : 'Complete el indicador ' + (dIdx + 1) + '.' + (iIdx + 1) + ' para generar el ítem en primera persona.';
+          numItem++;
+          return { numero: numItem, indicador: tInd, item: tItem };
+        });
+        return { nombre: nombreDim, indicadores: inds };
+      });
+
+      return {
+        autorNombre: AUTORES[autorKey].nombre,
+        alcance,
+        diseno,
+        v1Cap: v1 ? capOracion(v1) : 'Variable 1 (V1)',
+        v2Cap: v2 ? capOracion(v2) : 'Variable 2 (V2)',
+        defV1: defV1 || 'Ingrese la definición conceptual de la Variable 1 respaldada por un autor científico (Apellido, Año).',
+        defV2: defV2 || 'Ingrese la definición conceptual de la Variable 2 respaldada por un autor científico (Apellido, Año).',
+        pob,
+        org,
+        titulo,
+        pg,
+        og,
+        hg,
+        pes,
+        oes,
+        hes,
+        opDimsV1,
+        opDimsV2
+      };
+    }
+
+    function renderizarTodoHtml() {
+      const d = obtenerDatosCalculadosHtml();
+      const tipoEscala = document.getElementById('tipoEscalaHtml').value;
+      const escala = ESCALAS[tipoEscala];
+
+      document.getElementById('badgeAutorHtml').innerText = d.autorNombre;
+      document.getElementById('tituloGeneradoHtml').innerText = d.titulo || 'Complete los casilleros para visualizar el título con concordancia gramatical.';
+      document.getElementById('pgHtml').innerText = d.pg;
+      document.getElementById('pesHtml').innerHTML = d.pes.map(p => '<p><strong>' + p.id + ':</strong> ' + escHtml(p.texto) + '</p>').join('');
+      document.getElementById('ogHtml').innerText = d.og;
+      document.getElementById('oesHtml').innerHTML = d.oes.map(o => '<p><strong>' + o.id + ':</strong> ' + escHtml(o.texto) + '</p>').join('');
+      document.getElementById('hgHtml').innerText = d.hg;
+      document.getElementById('hesHtml').innerHTML = d.hes.map(h => '<p><strong>' + h.id + ':</strong> ' + escHtml(h.texto) + '</p>').join('');
+
+      let filasOp = '';
+      d.opDimsV1.forEach((dim, idx) => {
+        filasOp += '<tr class="align-top">';
+        if (idx === 0) {
+          filasOp += '<td rowspan="' + d.opDimsV1.length + '" data-etiqueta="Variable 1" class="font-bold">' + escHtml(d.v1Cap) + '</td>';
+          filasOp += '<td rowspan="' + d.opDimsV1.length + '" data-etiqueta="Definición conceptual">' + escHtml(d.defV1) + '</td>';
+        }
+        filasOp += '<td data-etiqueta="Dimensión" class="font-semibold">' + escHtml(dim.nombre) + '</td>';
+        filasOp += '<td data-etiqueta="Indicadores"><ul class="list-disc list-inside space-y-1">' + dim.indicadores.map(i => '<li>' + escHtml(i.indicador) + '</li>').join('') + '</ul></td></tr>';
+      });
+      d.opDimsV2.forEach((dim, idx) => {
+        filasOp += '<tr class="align-top">';
+        if (idx === 0) {
+          filasOp += '<td rowspan="' + d.opDimsV2.length + '" data-etiqueta="Variable 2" class="font-bold">' + escHtml(d.v2Cap) + '</td>';
+          filasOp += '<td rowspan="' + d.opDimsV2.length + '" data-etiqueta="Definición conceptual">' + escHtml(d.defV2) + '</td>';
+        }
+        filasOp += '<td data-etiqueta="Dimensión" class="font-semibold">' + escHtml(dim.nombre) + '</td>';
+        filasOp += '<td data-etiqueta="Indicadores"><ul class="list-disc list-inside space-y-1">' + dim.indicadores.map(i => '<li>' + escHtml(i.indicador) + '</li>').join('') + '</ul></td></tr>';
+      });
+      document.getElementById('cuerpoTablaOperacionalizacionHtml').innerHTML = filasOp;
+
+      document.getElementById('cabeceraLikertHtml').innerHTML =
+        '<tr>' +
+        '<th class="w-16 text-center">N.º</th>' +
+        '<th>Ítem del cuestionario (1.ª persona · presente simple)</th>' +
+        escala.opciones.map(op => '<th class="w-32 text-center">' + escHtml(op) + '</th>').join('') +
+        '</tr>';
+
+      let filasLikert = '';
+      [{ titulo: 'Variable 1: ' + d.v1Cap, dims: d.opDimsV1 }, { titulo: 'Variable 2: ' + d.v2Cap, dims: d.opDimsV2 }].forEach(bl => {
+        filasLikert += '<tr class="font-bold"><td colspan="7" class="p-3 font-bold" style="background-color: var(--color-primario-claro); color: var(--color-primario-oscuro);">' + escHtml(bl.titulo) + '</td></tr>';
+        bl.dims.forEach(dim => {
+          filasLikert += '<tr class="font-semibold"><td colspan="7" class="p-2.5 font-semibold bg-slate-100 text-slate-800">Dimensión: ' + escHtml(dim.nombre) + '</td></tr>';
+          dim.indicadores.forEach(it => {
+            filasLikert += '<tr>' +
+              '<td data-etiqueta="Número de ítem" class="text-center font-bold">' + it.numero + '</td>' +
+              '<td data-etiqueta="Ítem">' + escHtml(it.item) + '</td>' +
+              escala.opciones.map((opLabel, cIdx) => '<td data-etiqueta="' + escHtml(opLabel) + '" class="text-center"><input type="radio" name="likert_' + it.numero + '" aria-label="Ítem ' + it.numero + ': ' + escHtml(opLabel) + '" class="h-4 w-4 cursor-pointer" /></td>').join('') +
+              '</tr>';
+          });
+        });
+      });
+      document.getElementById('cuerpoLikertHtml').innerHTML = filasLikert;
+
+      document.getElementById('cuerpoMatrizConsistenciaHtml').innerHTML =
+        '<tr class="align-top">' +
+        '<td data-etiqueta="Título" class="font-bold">' + escHtml(d.titulo || 'Pendiente de completar...') + '</td>' +
+        '<td data-etiqueta="Problemas" class="space-y-3"><div><strong class="block">Problema general</strong><p class="italic mt-1">' + escHtml(d.pg) + '</p></div><div><strong class="block">Problemas específicos</strong><ul class="list-disc list-inside space-y-1 mt-1">' + d.pes.map(p => '<li><strong>' + p.id + ':</strong> ' + escHtml(p.texto) + '</li>').join('') + '</ul></div></td>' +
+        '<td data-etiqueta="Objetivos" class="space-y-3"><div><strong class="block">Objetivo general</strong><p class="mt-1">' + escHtml(d.og) + '</p></div><div><strong class="block">Objetivos específicos</strong><ul class="list-disc list-inside space-y-1 mt-1">' + d.oes.map(o => '<li><strong>' + o.id + ':</strong> ' + escHtml(o.texto) + '</li>').join('') + '</ul></div></td>' +
+        '<td data-etiqueta="Hipótesis" class="space-y-3"><div><strong class="block">Hipótesis general</strong><p class="mt-1">' + escHtml(d.hg) + '</p></div><div><strong class="block">Hipótesis específicas</strong><ul class="list-disc list-inside space-y-1 mt-1">' + d.hes.map(h => '<li><strong>' + h.id + ':</strong> ' + escHtml(h.texto) + '</li>').join('') + '</ul></div></td>' +
+        '<td data-etiqueta="Variables y dimensiones" class="space-y-3"><div><strong class="block">Variable 1 (V1)</strong><span>' + escHtml(d.v1Cap) + '</span><ul class="list-disc list-inside mt-1">' + d.opDimsV1.map(x => '<li>' + escHtml(x.nombre) + '</li>').join('') + '</ul></div><div class="pt-2 border-t border-slate-200"><strong class="block">Variable 2 (V2)</strong><span>' + escHtml(d.v2Cap) + '</span><ul class="list-disc list-inside mt-1">' + d.opDimsV2.map(x => '<li>' + escHtml(x.nombre) + '</li>').join('') + '</ul></div></td>' +
+        '<td data-etiqueta="Metodología" class="space-y-1.5"><div><strong>Enfoque:</strong> Cuantitativo</div><div><strong>Tipo:</strong> Aplicada</div><div><strong>Nivel o alcance:</strong> ' + (d.alcance === 'correlacional' ? 'Correlacional' : 'Explicativo o causal') + '</div><div><strong>Diseño:</strong> No experimental, transversal (' + d.diseno + ')</div><div><strong>Población:</strong> ' + escHtml(d.pob ? capOracion(d.pob) : 'Por definir') + (d.org ? ' (' + escHtml(d.org) + ')' : '') + '</div><div><strong>Técnica:</strong> Encuesta</div><div><strong>Instrumento:</strong> Cuestionario (' + escHtml(escala.nombre) + ')</div></td>' +
+        '</tr>';
+
+      if (typeof actualizarResumenHojaYProgreso === 'function') {
+        actualizarResumenHojaYProgreso(d, escala);
+      }
+    }
+
+    function validarYGenerarHtml() {
+      const obligatorios = [
+        { id: 'v1Html', errId: 'err-v1Html', nombre: 'Variable 1 (V1)', paso: 1 },
+        { id: 'v2Html', errId: 'err-v2Html', nombre: 'Variable 2 (V2)', paso: 1 },
+        { id: 'orgHtml', errId: 'err-orgHtml', nombre: 'Organización o institución', paso: 1 },
+        { id: 'pobHtml', errId: 'err-pobHtml', nombre: 'Población o muestra', paso: 1 },
+        { id: 'lugHtml', errId: 'err-lugHtml', nombre: 'Lugar o ciudad', paso: 1 },
+        { id: 'anioHtml', errId: 'err-anioHtml', nombre: 'Año del estudio', paso: 1 }
+      ];
+      const faltan = [];
+      let primerPasoConError = null;
+      obligatorios.forEach(c => {
+        const el = document.getElementById(c.id);
+        const errEl = document.getElementById(c.errId);
+        if (!el.value.trim()) {
+          el.classList.add('border-red-500', 'bg-red-50');
+          if (errEl) errEl.classList.add('visible');
+          faltan.push(c.nombre);
+          if (primerPasoConError === null) primerPasoConError = c.paso;
+        } else {
+          el.classList.remove('border-red-500', 'bg-red-50');
+          if (errEl) errEl.classList.remove('visible');
+        }
+      });
+
+      let faltanDimsV1 = false;
+      state.dimsV1.forEach((dim, idx) => {
+        const el = document.getElementById('dimV1Input_' + idx);
+        if (!dim.trim()) {
+          if (el) el.classList.add('border-red-500', 'bg-red-50');
+          faltanDimsV1 = true;
+          faltan.push('Dimensión ' + (idx + 1) + ' de V1');
+          if (primerPasoConError === null) primerPasoConError = 1;
+        } else if (el) {
+          el.classList.remove('border-red-500', 'bg-red-50');
+        }
+      });
+      const errDimsV1 = document.getElementById('err-dimsV1');
+      if (errDimsV1) errDimsV1.classList.toggle('visible', faltanDimsV1);
+
+      let faltanDimsV2 = false;
+      state.dimsV2.forEach((dim, idx) => {
+        const el = document.getElementById('dimV2Input_' + idx);
+        if (!dim.trim()) {
+          if (el) el.classList.add('border-red-500', 'bg-red-50');
+          faltanDimsV2 = true;
+          faltan.push('Dimensión ' + (idx + 1) + ' de V2');
+          if (primerPasoConError === null) primerPasoConError = 1;
+        } else if (el) {
+          el.classList.remove('border-red-500', 'bg-red-50');
+        }
+      });
+      const errDimsV2 = document.getElementById('err-dimsV2');
+      if (errDimsV2) errDimsV2.classList.toggle('visible', faltanDimsV2);
+
+      const alerta = document.getElementById('alertaValidacion');
+      const exito = document.getElementById('alertaExito');
+      if (faltan.length > 0) {
+        if (primerPasoConError !== null && typeof irAPaso === 'function') {
+          irAPaso(primerPasoConError);
+        }
+        document.getElementById('textoFaltantes').innerText = faltan.join(' · ');
+        alerta.classList.remove('hidden');
+        exito.classList.add('hidden');
+        if (typeof mostrarToast === 'function') {
+          mostrarToast('Faltan campos obligatorios por completar.', 'error');
+        }
+        return false;
+      }
+      alerta.classList.add('hidden');
+      exito.classList.remove('hidden');
+      setTimeout(() => exito.classList.add('hidden'), 3500);
+      renderizarTodoHtml();
+      return true;
+    }
+
+    function copiarTodoHtml() {
+      if (!validarYGenerarHtml()) return;
+      const d = obtenerDatosCalculadosHtml();
+      const txt = [
+        'TÍTULO: ' + d.titulo,
+        '\nPROBLEMA GENERAL: ' + d.pg,
+        ...d.pes.map(p => p.id + ': ' + p.texto),
+        '\nOBJETIVO GENERAL: ' + d.og,
+        ...d.oes.map(o => o.id + ': ' + o.texto),
+        '\nHIPÓTESIS GENERAL: ' + d.hg,
+        ...d.hes.map(h => h.id + ': ' + h.texto)
+      ].join('\n');
+      const t = document.createElement('textarea');
+      t.value = txt;
+      document.body.appendChild(t);
+      t.select();
+      document.execCommand('copy');
+      document.body.removeChild(t);
+      if (typeof mostrarToast === 'function') {
+        mostrarToast('Copiado ✔');
+      }
+    }
+
+    function exportarTxtHtml() {
+      if (!validarYGenerarHtml()) return;
+      const d = obtenerDatosCalculadosHtml();
+      const escala = ESCALAS[document.getElementById('tipoEscalaHtml').value];
+      const lineas = [
+        'MATRIZ DE CONSISTENCIA, OPERACIONALIZACIÓN Y CUESTIONARIO LIKERT',
+        'AUTOR: ' + d.autorNombre,
+        '\nTÍTULO:\n' + d.titulo,
+        '\nPROBLEMA GENERAL:\n' + d.pg,
+        ...d.pes.map(p => p.id + ': ' + p.texto),
+        '\nOBJETIVO GENERAL:\n' + d.og,
+        ...d.oes.map(o => o.id + ': ' + o.texto),
+        '\nHIPÓTESIS GENERAL:\n' + d.hg,
+        ...d.hes.map(h => h.id + ': ' + h.texto),
+        '\nOPERACIONALIZACIÓN DE VARIABLES:',
+        'V1: ' + d.v1Cap + ' -> ' + d.defV1,
+        ...d.opDimsV1.map(x => '  - ' + x.nombre + ': ' + x.indicadores.map(i => i.indicador).join(' | ')),
+        'V2: ' + d.v2Cap + ' -> ' + d.defV2,
+        ...d.opDimsV2.map(x => '  - ' + x.nombre + ': ' + x.indicadores.map(i => i.indicador).join(' | ')),
+        '\nCUESTIONARIO (' + escala.nombre + '):',
+        ...[...d.opDimsV1, ...d.opDimsV2].flatMap(x => x.indicadores.map(it => 'Ítem ' + it.numero + '. ' + it.item)),
+        '\nHecho por: Estrada Domínguez Alimber'
+      ];
+      const blob = new Blob([lineas.join('\n')], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Matriz_Operacionalizacion_Cuestionario.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+      if (typeof mostrarToast === 'function') {
+        mostrarToast('Archivo generado ✔');
+      }
+    }
+
+    function exportarDocxHtml() {
+      if (!validarYGenerarHtml()) return;
+      const d = obtenerDatosCalculadosHtml();
+      const escala = ESCALAS[document.getElementById('tipoEscalaHtml').value];
+      const escudoSlot = document.getElementById('escudoUnasamSlot');
+      const escudoSvgDocx = escudoSlot ? escudoSlot.innerHTML : '';
+
+      const filasV1 = d.opDimsV1.map((dim, idx) =>
+        '<tr>' +
+        (idx === 0
+          ? '<td rowspan="' + d.opDimsV1.length + '" style="border:1px solid #334155;padding:6px;font-weight:bold;vertical-align:top;">' + escHtml(d.v1Cap) + '</td>' +
+            '<td rowspan="' + d.opDimsV1.length + '" style="border:1px solid #334155;padding:6px;vertical-align:top;">' + escHtml(d.defV1) + '</td>'
+          : '') +
+        '<td style="border:1px solid #334155;padding:6px;font-weight:bold;vertical-align:top;">' + escHtml(dim.nombre) + '</td>' +
+        '<td style="border:1px solid #334155;padding:6px;vertical-align:top;"><ul style="margin:0;padding-left:16px;">' +
+        dim.indicadores.map(i => '<li>' + escHtml(i.indicador) + '</li>').join('') +
+        '</ul></td></tr>'
+      ).join('');
+
+      const filasV2 = d.opDimsV2.map((dim, idx) =>
+        '<tr>' +
+        (idx === 0
+          ? '<td rowspan="' + d.opDimsV2.length + '" style="border:1px solid #334155;padding:6px;font-weight:bold;vertical-align:top;">' + escHtml(d.v2Cap) + '</td>' +
+            '<td rowspan="' + d.opDimsV2.length + '" style="border:1px solid #334155;padding:6px;vertical-align:top;">' + escHtml(d.defV2) + '</td>'
+          : '') +
+        '<td style="border:1px solid #334155;padding:6px;font-weight:bold;vertical-align:top;">' + escHtml(dim.nombre) + '</td>' +
+        '<td style="border:1px solid #334155;padding:6px;vertical-align:top;"><ul style="margin:0;padding-left:16px;">' +
+        dim.indicadores.map(i => '<li>' + escHtml(i.indicador) + '</li>').join('') +
+        '</ul></td></tr>'
+      ).join('');
+
+      const filasLikert = [{ titulo: 'Variable 1: ' + d.v1Cap, dims: d.opDimsV1 }, { titulo: 'Variable 2: ' + d.v2Cap, dims: d.opDimsV2 }].map(b =>
+        '<tr><td colspan="7" style="border:1px solid #334155;padding:6px;background:#e2e8f0;font-weight:bold;">' + escHtml(b.titulo) + '</td></tr>' +
+        b.dims.map(dim =>
+          '<tr><td colspan="7" style="border:1px solid #334155;padding:5px;background:#f8fafc;font-weight:bold;">Dimensión: ' + escHtml(dim.nombre) + '</td></tr>' +
+          dim.indicadores.map(it =>
+            '<tr><td style="border:1px solid #334155;padding:5px;text-align:center;font-weight:bold;">' + it.numero + '</td>' +
+            '<td style="border:1px solid #334155;padding:5px;">' + escHtml(it.item) + '</td>' +
+            '<td style="border:1px solid #334155;padding:5px;text-align:center;">( )</td>' +
+            '<td style="border:1px solid #334155;padding:5px;text-align:center;">( )</td>' +
+            '<td style="border:1px solid #334155;padding:5px;text-align:center;">( )</td>' +
+            '<td style="border:1px solid #334155;padding:5px;text-align:center;">( )</td>' +
+            '<td style="border:1px solid #334155;padding:5px;text-align:center;">( )</td></tr>'
+          ).join('')
+        ).join('')
+      ).join('');
+
+      const docWord =
+        '<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style>' +
+        'body{font-family:"Times New Roman",Georgia,serif;font-size:11pt;color:#0f172a;line-height:1.45;}' +
+        'h1{font-size:15pt;text-align:center;text-transform:uppercase;margin-bottom:4px;}' +
+        'h2{font-size:12pt;color:#1e3a8a;border-bottom:1.5px solid #1e3a8a;padding-bottom:3px;margin-top:20px;margin-bottom:8px;}' +
+        'table{width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:14px;font-size:9.5pt;}' +
+        'th{background:#0f172a;color:#ffffff;border:1px solid #334155;padding:7px;text-align:left;}' +
+        '</style></head><body>' +
+        '<div style="text-align:center;margin-bottom:8px;">' + escudoSvgDocx + '</div>' +
+        '<h1>Estructura Metodológica de Investigación</h1>' +
+        '<p align="center" style="text-align:center;font-size:10pt;color:#475569;">Autor: <strong>' + escHtml(d.autorNombre) + '</strong> &middot; Alcance: <strong>' + (d.alcance === 'correlacional' ? 'Correlacional' : 'Explicativo') + '</strong></p>' +
+        '<h2>1. Título de la Investigación</h2><p style="font-weight:bold;font-size:11.5pt;">' + escHtml(d.titulo) + '</p>' +
+        '<h2>2. Planteamiento del Problema, Objetivos e Hipótesis</h2>' +
+        '<p><strong>Problema General:</strong> <em>' + escHtml(d.pg) + '</em></p><ul>' + d.pes.map(p => '<li><strong>' + p.id + ':</strong> ' + escHtml(p.texto) + '</li>').join('') + '</ul>' +
+        '<p><strong>Objetivo General:</strong> ' + escHtml(d.og) + '</p><ul>' + d.oes.map(o => '<li><strong>' + o.id + ':</strong> ' + escHtml(o.texto) + '</li>').join('') + '</ul>' +
+        '<p><strong>Hipótesis General:</strong> ' + escHtml(d.hg) + '</p><ul>' + d.hes.map(h => '<li><strong>' + h.id + ':</strong> ' + escHtml(h.texto) + '</li>').join('') + '</ul>' +
+        '<h2>3. Tabla de Operacionalización de Variables</h2>' +
+        '<table border="1" cellpadding="6" cellspacing="0" width="100%"><thead><tr><th width="18%" bgcolor="#0f172a" style="color:#ffffff;">Variables</th><th width="32%" bgcolor="#0f172a" style="color:#ffffff;">Definición Conceptual</th><th width="20%" bgcolor="#0f172a" style="color:#ffffff;">Dimensiones</th><th width="30%" bgcolor="#0f172a" style="color:#ffffff;">Indicadores</th></tr></thead><tbody>' + filasV1 + filasV2 + '</tbody></table>' +
+        '<h2>4. Cuestionario / Instrumento de Recolección de Datos</h2>' +
+        '<p style="font-size:10pt;"><strong>Escala Likert:</strong> ' + escHtml(escala.nombre) + '</p>' +
+        '<table border="1" cellpadding="6" cellspacing="0" width="100%"><thead><tr><th width="6%" bgcolor="#0f172a" style="color:#ffffff;text-align:center;">N°</th><th width="44%" bgcolor="#0f172a" style="color:#ffffff;">Ítem</th>' + escala.opciones.map(op => '<th width="10%" bgcolor="#0f172a" style="color:#ffffff;text-align:center;font-size:8.5pt;">' + escHtml(op) + '</th>').join('') + '</tr></thead><tbody>' + filasLikert + '</tbody></table>' +
+        '<h2>5. Tabla de Matriz de Consistencia Integral</h2>' +
+        '<table border="1" cellpadding="6" cellspacing="0" width="100%"><thead><tr><th bgcolor="#0f172a" style="color:#ffffff;">Título</th><th bgcolor="#0f172a" style="color:#ffffff;">Problemas</th><th bgcolor="#0f172a" style="color:#ffffff;">Objetivos</th><th bgcolor="#0f172a" style="color:#ffffff;">Hipótesis</th><th bgcolor="#0f172a" style="color:#ffffff;">Variables y Dimensiones</th><th bgcolor="#0f172a" style="color:#ffffff;">Metodología</th></tr></thead><tbody><tr valign="top">' +
+        '<td valign="top" bgcolor="#eff6ff" style="border:1px solid #334155;padding:6px;font-weight:bold;">' + escHtml(d.titulo) + '</td>' +
+        '<td valign="top" style="border:1px solid #334155;padding:6px;"><strong>PG:</strong> <em>' + escHtml(d.pg) + '</em><br/><br/>' + d.pes.map(p => '<strong>' + p.id + ':</strong> ' + escHtml(p.texto)).join('<br/>') + '</td>' +
+        '<td valign="top" style="border:1px solid #334155;padding:6px;"><strong>OG:</strong> ' + escHtml(d.og) + '<br/><br/>' + d.oes.map(o => '<strong>' + o.id + ':</strong> ' + escHtml(o.texto)).join('<br/>') + '</td>' +
+        '<td valign="top" style="border:1px solid #334155;padding:6px;"><strong>HG:</strong> ' + escHtml(d.hg) + '<br/><br/>' + d.hes.map(h => '<strong>' + h.id + ':</strong> ' + escHtml(h.texto)).join('<br/>') + '</td>' +
+        '<td valign="top" style="border:1px solid #334155;padding:6px;"><strong>V1: ' + escHtml(d.v1Cap) + '</strong><br/>' + d.opDimsV1.map(x => '&bull; ' + escHtml(x.nombre)).join('<br/>') + '<br/><br/><strong>V2: ' + escHtml(d.v2Cap) + '</strong><br/>' + d.opDimsV2.map(x => '&bull; ' + escHtml(x.nombre)).join('<br/>') + '</td>' +
+        '<td valign="top" bgcolor="#f8fafc" style="border:1px solid #334155;padding:6px;"><strong>Enfoque:</strong> Cuantitativo<br/><strong>Tipo:</strong> Aplicada<br/><strong>Nivel:</strong> ' + (d.alcance === 'correlacional' ? 'Correlacional' : 'Explicativo') + '<br/><strong>Diseño:</strong> No experimental, transversal (' + d.diseno + ')<br/><strong>Población:</strong> ' + escHtml(d.pob) + ' (' + escHtml(d.org) + ')<br/><strong>Técnica:</strong> Encuesta<br/><strong>Instrumento:</strong> Cuestionario Likert</td>' +
+        '</tr></tbody></table>' +
+        '<p align="right" style="margin-top:20px;text-align:right;font-size:9pt;color:#64748b;">Hecho por: Estrada Domínguez Alimber</p>' +
+        '</body></html>';
+
+      const blob = new Blob(['\ufeff', docWord], { type: 'application/msword;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Proyecto_Metodologico_Tesis.doc';
+      a.click();
+      URL.revokeObjectURL(url);
+      if (typeof mostrarToast === 'function') {
+        mostrarToast('Archivo generado ✔');
+      }
+    }
+
+    window.onload = function() {
+      dibujarControlesDinamicosHtml();
+      alCambiarAlcanceHtml();
+      if (typeof restaurarEstadoLocal === 'function') {
+        restaurarEstadoLocal();
+      }
+      if (typeof inicializarModoDesarrollador === 'function') {
+        inicializarModoDesarrollador();
+      }
+      if (typeof establecerPasoActivo === 'function') {
+        establecerPasoActivo(1, false);
+      }
+    };
+  </script>
+
+  <!-- ========================================================================
+       EXTENSIONES UI/UX EN BLOQUE APARTE (TOASTS, LOCALSTORAGE, PASOS, MENÚ)
+       ======================================================================== -->
+  <script>
+    const CLAVE_STORAGE_UNASAM = 'generador_metodologico_unasam_v24';
+    const CLAVE_SESSION_DEV = 'unasam_modo_dev_activo';
+    let pasoActualUI = 1;
+
+    function esModoDesarrolladorActivo() {
+      try {
+        return sessionStorage.getItem(CLAVE_SESSION_DEV) === '1';
+      } catch (err) {
+        return false;
+      }
+    }
+
+    function aplicarInterfazModoDesarrollador(activo) {
+      const dropdown = document.getElementById('dropdownExportar');
+      const opcionExistente = document.getElementById('opcionDevDescargarHtml');
+      const separadorExistente = document.getElementById('separadorDevDescargarHtml');
+      const insigniaExistente = document.getElementById('insigniaModoDesarrollador');
+
+      if (activo) {
+        if (dropdown && !opcionExistente) {
+          const separador = document.createElement('div');
+          separador.id = 'separadorDevDescargarHtml';
+          separador.className = 'my-1 border-t border-slate-200';
+
+          const btnDev = document.createElement('button');
+          btnDev.type = 'button';
+          btnDev.id = 'opcionDevDescargarHtml';
+          btnDev.setAttribute('role', 'menuitem');
+          btnDev.className = 'w-full text-left px-4 py-3 text-sm font-medium text-slate-800 hover:bg-blue-50 flex items-center justify-between';
+          btnDev.innerHTML =
+            '<span>Descargar App .HTML</span>' +
+            '<span class="px-2 py-0.5 text-xs font-bold rounded bg-amber-100 text-amber-800 border border-amber-300">DEV</span>';
+          btnDev.onclick = function () {
+            descargarAppHtml();
+            cerrarMenuExportar();
+          };
+
+          dropdown.appendChild(separador);
+          dropdown.appendChild(btnDev);
+        }
+
+        if (!insigniaExistente) {
+          const insignia = document.createElement('div');
+          insignia.id = 'insigniaModoDesarrollador';
+          insignia.className = 'fixed bottom-4 left-4 z-50 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-900 text-white border border-amber-400 shadow-lg text-sm font-semibold no-imprimir';
+          insignia.innerHTML =
+            '<span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-400"></span>' +
+            '<span>Modo desarrollador activo</span>' +
+            '<button type="button" onclick="salirModoDesarrollador()" class="px-2.5 py-1 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-bold">Salir</button>';
+          document.body.appendChild(insignia);
+        }
+      } else {
+        if (opcionExistente) opcionExistente.remove();
+        if (separadorExistente) separadorExistente.remove();
+        if (insigniaExistente) insigniaExistente.remove();
+      }
+    }
+
+    function activarModoDesarrollador() {
+      try {
+        sessionStorage.setItem(CLAVE_SESSION_DEV, '1');
+      } catch (err) {
+        // Ignorar si sessionStorage no está disponible
+      }
+      aplicarInterfazModoDesarrollador(true);
+    }
+
+    function salirModoDesarrollador() {
+      try {
+        sessionStorage.removeItem(CLAVE_SESSION_DEV);
+      } catch (err) {
+        // Ignorar si sessionStorage no está disponible
+      }
+      aplicarInterfazModoDesarrollador(false);
+    }
+
+    function inicializarModoDesarrollador() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const claveUrl = params.get('dev');
+        if (claveUrl !== null) {
+          if (claveUrl === CLAVE_DESARROLLADOR) {
+            activarModoDesarrollador();
+          }
+          // Limpiar el parámetro ?dev= de la barra de direcciones sin recargar
+          params.delete('dev');
+          const nuevaQuery = params.toString();
+          const nuevaUrl = window.location.pathname + (nuevaQuery ? '?' + nuevaQuery : '') + window.location.hash;
+          window.history.replaceState({}, '', nuevaUrl);
+        }
+      } catch (err) {
+        // Ignorar errores de URLSearchParams
+      }
+
+      if (esModoDesarrolladorActivo()) {
+        aplicarInterfazModoDesarrollador(true);
+      }
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) {
+        e.preventDefault();
+        const claveIngresada = window.prompt('Clave de acceso:');
+        if (claveIngresada !== null && claveIngresada === CLAVE_DESARROLLADOR) {
+          activarModoDesarrollador();
+        }
+      }
+    });
+
+    function mostrarToast(mensaje, tipo = 'exito') {
+      const cont = document.getElementById('toastContenedor');
+      if (!cont) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast-mensaje' + (tipo === 'error' ? ' toast-error' : '');
+      toast.setAttribute('role', 'status');
+      toast.textContent = mensaje;
+      cont.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+        setTimeout(() => toast.remove(), 180);
+      }, 2600);
+    }
+
+    function descargarAppHtml() {
+      // Clonar el documento actual para conservar valores ingresados y limpiar estados temporales
+      const clonDoc = document.documentElement.cloneNode(true);
+
+      // Sincronizar valores actuales de inputs, selects y textareas en el HTML exportado
+      const origInputs = document.querySelectorAll('input, textarea, select');
+      const clonInputs = clonDoc.querySelectorAll('input, textarea, select');
+      origInputs.forEach((orig, idx) => {
+        const dest = clonInputs[idx];
+        if (!dest) return;
+        if (orig.tagName === 'TEXTAREA') {
+          dest.textContent = orig.value;
+        } else if (orig.tagName === 'SELECT') {
+          Array.from(dest.options).forEach((opt) => {
+            if (opt.value === orig.value) {
+              opt.setAttribute('selected', 'selected');
+            } else {
+              opt.removeAttribute('selected');
+            }
+          });
+        } else if (orig.type === 'radio' || orig.type === 'checkbox') {
+          if (orig.checked) dest.setAttribute('checked', 'checked');
+          else dest.removeAttribute('checked');
+        } else {
+          dest.setAttribute('value', orig.value);
+        }
+      });
+
+      const toastClon = clonDoc.querySelector('#toastContenedor');
+      if (toastClon) toastClon.innerHTML = '';
+
+      const dropdownClon = clonDoc.querySelector('#dropdownExportar');
+      if (dropdownClon) dropdownClon.classList.add('hidden');
+
+      const btnMenuClon = clonDoc.querySelector('#btnMasOpcionesExportar');
+      if (btnMenuClon) btnMenuClon.setAttribute('aria-expanded', 'false');
+
+      const contenidoHtml = '<!DOCTYPE html>\n' + clonDoc.outerHTML;
+      const blob = new Blob([contenidoHtml], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement('a');
+      enlace.href = url;
+      enlace.download = 'Generador_Metodologico_UNASAM.html';
+      enlace.click();
+      URL.revokeObjectURL(url);
+      mostrarToast('Archivo generado ✔');
+    }
+
+    function validarYGenerarHtmlConMensajes() {
+      const ok = validarYGenerarHtml();
+      if (ok) {
+        mostrarToast('Paso 1 validado correctamente ✔');
+      }
+    }
+
+    function alternarMenuExportar(evento) {
+      if (evento) evento.stopPropagation();
+      const menu = document.getElementById('dropdownExportar');
+      const btn = document.getElementById('btnMasOpcionesExportar');
+      if (!menu || !btn) return;
+      const estaAbierto = !menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', estaAbierto);
+      btn.setAttribute('aria-expanded', String(!estaAbierto));
+    }
+
+    function cerrarMenuExportar() {
+      const menu = document.getElementById('dropdownExportar');
+      const btn = document.getElementById('btnMasOpcionesExportar');
+      if (menu) menu.classList.add('hidden');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    document.addEventListener('click', function (e) {
+      const cont = document.getElementById('menuExportarContenedor');
+      if (cont && !cont.contains(e.target)) {
+        cerrarMenuExportar();
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        cerrarMenuExportar();
+      }
+    });
+
+    function aplicarVisibilidadApartados(numeroPaso) {
+      for (let i = 1; i <= 4; i++) {
+        const seccion = document.getElementById('paso-' + i);
+        if (!seccion) continue;
+        if (i === numeroPaso) {
+          seccion.classList.remove('paso-oculto');
+        } else {
+          seccion.classList.add('paso-oculto');
+        }
+      }
+    }
+
+    function establecerPasoActivo(numeroPaso, desplazarAlInicio = true) {
+      pasoActualUI = numeroPaso;
+      aplicarVisibilidadApartados(numeroPaso);
+      for (let i = 1; i <= 4; i++) {
+        const pill = document.getElementById('navPaso' + i);
+        if (!pill) continue;
+        const completado = estaPasoCompletado(i);
+        if (i === numeroPaso) {
+          pill.setAttribute('data-estado', 'activo');
+        } else if (completado) {
+          pill.setAttribute('data-estado', 'completado');
+        } else {
+          pill.setAttribute('data-estado', 'pendiente');
+        }
+      }
+      actualizarEstadoVisualPasos();
+      if (desplazarAlInicio) {
+        const inicio = document.getElementById('inicio-contenido-principal');
+        if (inicio) {
+          inicio.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+
+    function estaPasoCompletado(paso) {
+      const v1 = (document.getElementById('v1Html')?.value || '').trim();
+      const v2 = (document.getElementById('v2Html')?.value || '').trim();
+      const pob = (document.getElementById('pobHtml')?.value || '').trim();
+      const org = (document.getElementById('orgHtml')?.value || '').trim();
+      const lug = (document.getElementById('lugHtml')?.value || '').trim();
+      const anio = (document.getElementById('anioHtml')?.value || '').trim();
+      const dimsV1Ok = state.dimsV1.some(d => d.trim().length > 0);
+
+      if (paso === 1) {
+        return Boolean(v1 && v2 && pob && org && lug && anio && dimsV1Ok);
+      }
+      if (paso === 2) {
+        const def1 = (document.getElementById('defV1Html')?.value || '').trim();
+        const def2 = (document.getElementById('defV2Html')?.value || '').trim();
+        const hayInd = state.indsV1.some(arr => arr.some(x => x.trim().length > 0));
+        return Boolean(def1 || def2 || hayInd);
+      }
+      if (paso === 3) {
+        return state.indsV1.some(arr => arr.some(x => x.trim().length > 0)) ||
+               state.indsV2.some(arr => arr.some(x => x.trim().length > 0));
+      }
+      if (paso === 4) {
+        return estaPasoCompletado(1);
+      }
+      return false;
+    }
+
+    function actualizarEstadoVisualPasos() {
+      let completadosCount = 0;
+      for (let i = 1; i <= 4; i++) {
+        const pill = document.getElementById('navPaso' + i);
+        const badge = document.getElementById('badgePaso' + i);
+        const done = estaPasoCompletado(i);
+        if (done) completadosCount++;
+
+        if (badge) {
+          badge.textContent = done && i !== pasoActualUI ? '✓' : String(i);
+        }
+        if (pill) {
+          if (i === pasoActualUI) {
+            pill.setAttribute('data-estado', 'activo');
+          } else if (done) {
+            pill.setAttribute('data-estado', 'completado');
+          } else {
+            pill.setAttribute('data-estado', 'pendiente');
+          }
+        }
+      }
+
+      const porcentaje = Math.round((completadosCount / 4) * 100);
+      const textoPorcentaje = document.getElementById('porcentajeAvanceTexto');
+      const barra = document.getElementById('barraAvancePorcentaje');
+      if (textoPorcentaje) textoPorcentaje.textContent = 'Avance completado: ' + porcentaje + '%';
+      if (barra) barra.style.width = porcentaje + '%';
+    }
+
+    function irAPaso(numeroPaso) {
+      establecerPasoActivo(numeroPaso, true);
+    }
+
+    function actualizarResumenHojaYProgreso(d, escala) {
+      actualizarEstadoVisualPasos();
+      const hoja = document.getElementById('resumenHojaFinal');
+      if (!hoja) return;
+
+      hoja.innerHTML =
+        '<div class="space-y-4">' +
+          '<div>' +
+            '<p class="font-semibold text-slate-600">Título de la investigación</p>' +
+            '<p class="text-lg font-bold text-slate-900 mt-1">' + escHtml(d.titulo || 'Complete los datos del Paso 1 para generar el título.') + '</p>' +
+          '</div>' +
+          '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-200">' +
+            '<div>' +
+              '<p class="font-bold text-slate-900">Problema general</p>' +
+              '<p class="italic mt-1">' + escHtml(d.pg) + '</p>' +
+            '</div>' +
+            '<div>' +
+              '<p class="font-bold text-slate-900">Objetivo general</p>' +
+              '<p class="mt-1">' + escHtml(d.og) + '</p>' +
+            '</div>' +
+            '<div>' +
+              '<p class="font-bold text-slate-900">Hipótesis general</p>' +
+              '<p class="mt-1">' + escHtml(d.hg) + '</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="pt-3 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">' +
+            '<div>' +
+              '<p class="font-bold text-slate-900">Variables y dimensiones</p>' +
+              '<p class="mt-1"><strong>V1:</strong> ' + escHtml(d.v1Cap) + ' (' + d.opDimsV1.map(x => escHtml(x.nombre)).join(', ') + ')</p>' +
+              '<p class="mt-1"><strong>V2:</strong> ' + escHtml(d.v2Cap) + ' (' + d.opDimsV2.map(x => escHtml(x.nombre)).join(', ') + ')</p>' +
+            '</div>' +
+            '<div>' +
+              '<p class="font-bold text-slate-900">Instrumento y escala</p>' +
+              '<p class="mt-1">Cuestionario estructurado con escala Likert de 5 puntos (' + escHtml(escala.nombre) + ').</p>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function copiarSeccionTabla(idTbody, etiquetaSeccion) {
+      const tbody = document.getElementById(idTbody);
+      if (!tbody) return;
+      const textoPlano = tbody.innerText.replace(/\n{3,}/g, '\n\n').trim();
+      if (!textoPlano) return;
+
+      const aux = document.createElement('textarea');
+      aux.value = etiquetaSeccion.toUpperCase() + '\n\n' + textoPlano;
+      document.body.appendChild(aux);
+      aux.select();
+      document.execCommand('copy');
+      document.body.removeChild(aux);
+      mostrarToast('Copiado ✔ (' + etiquetaSeccion + ')');
+    }
+
+    function cargarEjemploInstitucional() {
+      document.getElementById('autorHtml').value = 'villanueva';
+      document.getElementById('alcanceHtml').value = 'correlacional';
+      alCambiarAlcanceHtml();
+      document.getElementById('disenoHtml').value = 'bivariada';
+      toggleMultivariadaHtml();
+
+      document.getElementById('v1Html').value = 'Clima organizacional';
+      document.getElementById('v2Html').value = 'Desempeño laboral';
+      document.getElementById('conectorOrgHtml').value = 'auto';
+      document.getElementById('orgHtml').value = 'UNASAM';
+      document.getElementById('pobHtml').value = 'trabajadores administrativos';
+      document.getElementById('lugHtml').value = 'distrito de Independencia, Huaraz';
+      document.getElementById('anioHtml').value = '2026';
+
+      document.getElementById('defV1Html').value =
+        'Conjunto de percepciones compartidas por los trabajadores respecto a las prácticas, relaciones y condiciones de su entorno laboral (Chiavenato, 2017).';
+      document.getElementById('defV2Html').value =
+        'Grado de cumplimiento efectivo de las funciones, responsabilidades y metas asignadas al colaborador en su puesto (Robbins & Judge, 2018).';
+
+      state = {
+        varsExtra: [],
+        dimsV1: ['Comunicación interna', 'Compromiso institucional'],
+        indsV1: [
+          ['Claridad en la información', 'Puntualidad en reportes', 'Trabajo en equipo'],
+          ['Responsabilidad laboral', 'Motivación por el cargo', 'Adaptabilidad al cambio']
+        ],
+        dimsV2: ['Eficiencia operativa', 'Calidad del servicio'],
+        indsV2: [
+          ['Optimización de recursos', 'Cumplimiento de plazos', 'Productividad diaria'],
+          ['Precisión en trámites', 'Orientación al usuario', 'Resolución de problemas']
+        ]
+      };
+
+      ['v1Html', 'v2Html', 'orgHtml', 'pobHtml', 'lugHtml', 'anioHtml'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) limpiarErrorHtml(el);
+      });
+      ['err-v1Html', 'err-v2Html', 'err-orgHtml', 'err-pobHtml', 'err-lugHtml', 'err-anioHtml', 'err-dimsV1', 'err-dimsV2'].forEach(ocultarErrorCampo);
+      document.getElementById('alertaValidacion')?.classList.add('hidden');
+
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+      guardarEstadoLocal();
+      establecerPasoActivo(pasoActualUI || 1, false);
+      mostrarToast('Ejemplo institucional cargado ✔');
+    }
+
+    function ocultarErrorCampo(errId) {
+      const errEl = document.getElementById(errId);
+      if (errEl) errEl.classList.remove('visible');
+    }
+
+    function guardarEstadoLocal() {
+      try {
+        const payload = {
+          autor: document.getElementById('autorHtml')?.value || 'sampieri',
+          alcance: document.getElementById('alcanceHtml')?.value || 'correlacional',
+          diseno: document.getElementById('disenoHtml')?.value || 'bivariada',
+          prefijo: document.getElementById('prefijoHtml')?.value || '',
+          conector: document.getElementById('conectorHtml')?.value || '',
+          v1: document.getElementById('v1Html')?.value || '',
+          v2: document.getElementById('v2Html')?.value || '',
+          conectorOrg: document.getElementById('conectorOrgHtml')?.value || 'auto',
+          org: document.getElementById('orgHtml')?.value || '',
+          pob: document.getElementById('pobHtml')?.value || '',
+          lug: document.getElementById('lugHtml')?.value || '',
+          anio: document.getElementById('anioHtml')?.value || '',
+          defV1: document.getElementById('defV1Html')?.value || '',
+          defV2: document.getElementById('defV2Html')?.value || '',
+          tipoEscala: document.getElementById('tipoEscalaHtml')?.value || 'frecuencia',
+          state: state
+        };
+        localStorage.setItem(CLAVE_STORAGE_UNASAM, JSON.stringify(payload));
+        const lbl = document.getElementById('estadoGuardadoLocal');
+        if (lbl) lbl.textContent = 'Avance guardado automáticamente en este navegador';
+      } catch (err) {
+        // Ignorar si el almacenamiento local no está disponible
+      }
+    }
+
+    function restaurarEstadoLocal() {
+      try {
+        const raw = localStorage.getItem(CLAVE_STORAGE_UNASAM);
+        if (!raw) {
+          actualizarEstadoVisualPasos();
+          return;
+        }
+        const data = JSON.parse(raw);
+        if (data.state && Array.isArray(data.state.dimsV1)) {
+          state = {
+            varsExtra: Array.isArray(data.state.varsExtra) ? data.state.varsExtra : [],
+            dimsV1: data.state.dimsV1.length ? data.state.dimsV1 : ['', ''],
+            indsV1: Array.isArray(data.state.indsV1) ? data.state.indsV1 : [['', '', ''], ['', '', '']],
+            dimsV2: Array.isArray(data.state.dimsV2) && data.state.dimsV2.length ? data.state.dimsV2 : ['', ''],
+            indsV2: Array.isArray(data.state.indsV2) ? data.state.indsV2 : [['', '', ''], ['', '', '']]
+          };
+        }
+
+        if (data.autor) document.getElementById('autorHtml').value = data.autor;
+        if (data.alcance) document.getElementById('alcanceHtml').value = data.alcance;
+        alCambiarAlcanceHtml();
+
+        if (data.diseno) {
+          document.getElementById('disenoHtml').value = data.diseno;
+          toggleMultivariadaHtml();
+        }
+        if (typeof data.prefijo === 'string') document.getElementById('prefijoHtml').value = data.prefijo;
+        if (data.conector) document.getElementById('conectorHtml').value = data.conector;
+        if (typeof data.v1 === 'string') document.getElementById('v1Html').value = data.v1;
+        if (typeof data.v2 === 'string') document.getElementById('v2Html').value = data.v2;
+        if (data.conectorOrg) document.getElementById('conectorOrgHtml').value = data.conectorOrg;
+        if (typeof data.org === 'string') document.getElementById('orgHtml').value = data.org;
+        if (typeof data.pob === 'string') document.getElementById('pobHtml').value = data.pob;
+        if (typeof data.lug === 'string') document.getElementById('lugHtml').value = data.lug;
+        if (typeof data.anio === 'string') document.getElementById('anioHtml').value = data.anio;
+        if (typeof data.defV1 === 'string') document.getElementById('defV1Html').value = data.defV1;
+        if (typeof data.defV2 === 'string') document.getElementById('defV2Html').value = data.defV2;
+        if (data.tipoEscala) document.getElementById('tipoEscalaHtml').value = data.tipoEscala;
+
+        dibujarControlesDinamicosHtml();
+        renderizarTodoHtml();
+        establecerPasoActivo(1, false);
+      } catch (err) {
+        actualizarEstadoVisualPasos();
+      }
+    }
+
+    function reiniciarAvanceApp() {
+      try {
+        localStorage.removeItem(CLAVE_STORAGE_UNASAM);
+      } catch (err) {
+        // Ignorar error de storage
+      }
+
+      state = {
+        varsExtra: [],
+        dimsV1: ['', ''],
+        indsV1: [['', '', ''], ['', '', '']],
+        dimsV2: ['', ''],
+        indsV2: [['', '', ''], ['', '', '']]
+      };
+
+      document.getElementById('autorHtml').value = 'sampieri';
+      document.getElementById('alcanceHtml').value = 'correlacional';
+      document.getElementById('disenoHtml').value = 'bivariada';
+      document.getElementById('conectorOrgHtml').value = 'auto';
+      document.getElementById('tipoEscalaHtml').value = 'frecuencia';
+
+      ['v1Html', 'v2Html', 'orgHtml', 'pobHtml', 'lugHtml', 'anioHtml', 'defV1Html', 'defV2Html'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.value = '';
+          limpiarErrorHtml(el);
+        }
+      });
+
+      ['err-v1Html', 'err-v2Html', 'err-orgHtml', 'err-pobHtml', 'err-lugHtml', 'err-anioHtml', 'err-dimsV1', 'err-dimsV2'].forEach(ocultarErrorCampo);
+      document.getElementById('alertaValidacion')?.classList.add('hidden');
+      document.getElementById('alertaExito')?.classList.add('hidden');
+
+      toggleMultivariadaHtml();
+      alCambiarAlcanceHtml();
+      dibujarControlesDinamicosHtml();
+      renderizarTodoHtml();
+      establecerPasoActivo(1, true);
+      mostrarToast('Formulario reiniciado ✔');
+    }
+  </script>
+
+  <!-- ========================================================================
+       SIMULACIÓN GRÁFICA · MODELO ESTRUCTURAL (ESTILO SMARTPLS)
+       ======================================================================== -->
+  <script>
+    (function () {
+      function acortarTextoSvg(texto, maxChars) {
+        const limpio = String(texto || '').trim();
+        if (limpio.length <= maxChars) return limpio;
+        return limpio.slice(0, Math.max(1, maxChars - 1)).trim() + '…';
+      }
+
+      function puntoBordeCirculo(cx, cy, r, tx, ty) {
+        const dx = tx - cx;
+        const dy = ty - cy;
+        const dist = Math.hypot(dx, dy) || 1;
+        return {
+          x: cx + (dx / dist) * r,
+          y: cy + (dy / dist) * r
+        };
+      }
+
+      function dibujarModelo() {
+        const contenedor = document.getElementById('contenedorSvgSmartPls');
+        const resumenEl = document.getElementById('resumenModeloSmartPls');
+        if (!contenedor) return;
+
+        const v1Raw = (document.getElementById('v1Html')?.value || '').trim();
+        const v2Raw = (document.getElementById('v2Html')?.value || '').trim();
+        const alcance = (document.getElementById('alcanceHtml')?.value || '').trim();
+        const diseno = (document.getElementById('disenoHtml')?.value || 'bivariada').trim();
+
+        const dimsV1 = (Array.isArray(state.dimsV1) ? state.dimsV1 : []).slice(0, 8);
+        const dimsV2 = (Array.isArray(state.dimsV2) ? state.dimsV2 : []).slice(0, 8);
+        const varsExtra = diseno === 'multivariada' && Array.isArray(state.varsExtra)
+          ? state.varsExtra
+          : [];
+
+        const nDims1 = dimsV1.length;
+        const nDims2 = dimsV2.length;
+        const nExtra = varsExtra.length;
+        const totalVars = 2 + nExtra;
+        const totalDims = nDims1 + nDims2;
+
+        // Cálculo dinámico de altura y espaciado vertical para evitar superposiciones
+        const ancho = 860;
+        const altoDim = 32;
+        const gapDim = 14;
+        const pasoDim = altoDim + gapDim;
+
+        const bloqueDims1 = nDims1 > 0 ? nDims1 * altoDim + (nDims1 - 1) * gapDim : 0;
+        const bloqueDims2 = nDims2 > 0 ? nDims2 * altoDim + (nDims2 - 1) * gapDim : 0;
+
+        const rVar = 44;
+        const rExtra = 34;
+        const yV1 = 155;
+        const yV2 = 155;
+        const pasoExtra = 108;
+        const yUltimaExtra = nExtra > 0 ? yV1 + 115 + (nExtra - 1) * pasoExtra + rExtra + 38 : 0;
+
+        const maxBloqueDims = Math.max(bloqueDims1, bloqueDims2, 160);
+        const alto = Math.max(290, maxBloqueDims + 96, yUltimaExtra + 28);
+        const centroY = alto / 2;
+
+        const yCentroV1 = nExtra > 0 ? 148 : centroY;
+        const yCentroV2 = centroY;
+
+        const xDim1 = 24;
+        const wDim = 196;
+        const xV1 = 335;
+        const xV2 = 545;
+        const xDim2 = 640;
+
+        // Definición de marcadores de flecha
+        let defs = `
+          <defs>
+            <radialGradient id="plsGradVar" cx="35%" cy="30%" r="70%">
+              <stop offset="0%" stop-color="#4f8ef7" />
+              <stop offset="65%" stop-color="#1d56b8" />
+              <stop offset="100%" stop-color="#123a85" />
+            </radialGradient>
+            <linearGradient id="plsGradDim" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ecc334" />
+              <stop offset="100%" stop-color="#d4a517" />
+            </linearGradient>
+            <marker id="plsArrowDim" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto">
+              <path d="M 0 1.2 L 9 5 L 0 8.8 z" fill="#334155" />
+            </marker>
+            <marker id="plsArrowRelEnd" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 1.2 L 9 5 L 0 8.8 z" fill="#1e293b" />
+            </marker>
+            <marker id="plsArrowRelStart" viewBox="0 0 10 10" refX="1.5" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 10 1.2 L 1 5 L 10 8.8 z" fill="#1e293b" />
+            </marker>
+          </defs>
+        `;
+
+        let capasLineas = '';
+        let capasNodos = '';
+
+        // 1. Dimensiones de V1 (izquierda) y flechas hacia V1
+        const inicioYDims1 = yCentroV1 - bloqueDims1 / 2;
+        dimsV1.forEach((rawDim, idx) => {
+          const textoCompleto = rawDim.trim() || 'dimensión ' + (idx + 1);
+          const textoCorto = acortarTextoSvg(textoCompleto, 22);
+          const yBox = inicioYDims1 + idx * pasoDim;
+          const yMid = yBox + altoDim / 2;
+          const xOrigen = xDim1 + wDim;
+          const destino = puntoBordeCirculo(xV1, yCentroV1, rVar + 3, xOrigen, yMid);
+
+          capasLineas += `
+            <line x1="${xOrigen}" y1="${yMid}" x2="${destino.x.toFixed(1)}" y2="${destino.y.toFixed(1)}"
+              stroke="#475569" stroke-width="1.35" marker-end="url(#plsArrowDim)" />
+          `;
+
+          capasNodos += `
+            <g>
+              <title>${escHtml(textoCompleto)}</title>
+              <rect x="${xDim1}" y="${yBox}" width="${wDim}" height="${altoDim}" rx="6"
+                fill="url(#plsGradDim)" stroke="#b38910" stroke-width="1.2" />
+              <rect x="${xDim1 + 7}" y="${yBox + 6}" width="26" height="20" rx="4" fill="#6b5308" />
+              <text x="${xDim1 + 20}" y="${yBox + 20}" text-anchor="middle" fill="#ffffff"
+                font-family="Inter, sans-serif" font-size="10.5" font-weight="700">D${idx + 1}</text>
+              <text x="${xDim1 + 41}" y="${yBox + 20}" fill="#1f2937"
+                font-family="Inter, sans-serif" font-size="11.5" font-weight="600">${escHtml(textoCorto)}</text>
+            </g>
+          `;
+        });
+
+        // 2. Dimensiones de V2 (derecha) y flechas hacia V2
+        const inicioYDims2 = yCentroV2 - bloqueDims2 / 2;
+        dimsV2.forEach((rawDim, idx) => {
+          const textoCompleto = rawDim.trim() || 'dimensión ' + (idx + 1);
+          const textoCorto = acortarTextoSvg(textoCompleto, 22);
+          const yBox = inicioYDims2 + idx * pasoDim;
+          const yMid = yBox + altoDim / 2;
+          const xOrigen = xDim2;
+          const destino = puntoBordeCirculo(xV2, yCentroV2, rVar + 3, xOrigen, yMid);
+
+          capasLineas += `
+            <line x1="${xOrigen}" y1="${yMid}" x2="${destino.x.toFixed(1)}" y2="${destino.y.toFixed(1)}"
+              stroke="#475569" stroke-width="1.35" marker-end="url(#plsArrowDim)" />
+          `;
+
+          capasNodos += `
+            <g>
+              <title>${escHtml(textoCompleto)}</title>
+              <rect x="${xDim2}" y="${yBox}" width="${wDim}" height="${altoDim}" rx="6"
+                fill="url(#plsGradDim)" stroke="#b38910" stroke-width="1.2" />
+              <rect x="${xDim2 + 7}" y="${yBox + 6}" width="26" height="20" rx="4" fill="#6b5308" />
+              <text x="${xDim2 + 20}" y="${yBox + 20}" text-anchor="middle" fill="#ffffff"
+                font-family="Inter, sans-serif" font-size="10.5" font-weight="700">D${idx + 1}</text>
+              <text x="${xDim2 + 41}" y="${yBox + 20}" fill="#1f2937"
+                font-family="Inter, sans-serif" font-size="11.5" font-weight="600">${escHtml(textoCorto)}</text>
+            </g>
+          `;
+        });
+
+        // 3. Relación estructural entre V1 y V2 según alcance
+        let etiquetaRel = '? · HG';
+        let attrsMarcadores = '';
+        if (alcance === 'correlacional') {
+          etiquetaRel = 'r · HG';
+          attrsMarcadores = 'marker-start="url(#plsArrowRelStart)" marker-end="url(#plsArrowRelEnd)"';
+        } else if (alcance === 'explicativo') {
+          etiquetaRel = 'β · HG';
+          attrsMarcadores = 'marker-end="url(#plsArrowRelEnd)"';
+        }
+
+        const pInicioRel = puntoBordeCirculo(xV1, yCentroV1, rVar + 4, xV2, yCentroV2);
+        const pFinRel = puntoBordeCirculo(xV2, yCentroV2, rVar + 4, xV1, yCentroV1);
+        const midRelX = (pInicioRel.x + pFinRel.x) / 2;
+        const midRelY = (pInicioRel.y + pFinRel.y) / 2;
+
+        capasLineas += `
+          <line x1="${pInicioRel.x.toFixed(1)}" y1="${pInicioRel.y.toFixed(1)}"
+            x2="${pFinRel.x.toFixed(1)}" y2="${pFinRel.y.toFixed(1)}"
+            stroke="#1e293b" stroke-width="1.7" stroke-dasharray="5 4" ${attrsMarcadores} />
+          <g>
+            <rect x="${(midRelX - 30).toFixed(1)}" y="${(midRelY - 12).toFixed(1)}"
+              width="60" height="24" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+            <text x="${midRelX.toFixed(1)}" y="${(midRelY + 4).toFixed(1)}" text-anchor="middle"
+              fill="#0f172a" font-family="Inter, sans-serif" font-size="11" font-weight="700">${etiquetaRel}</text>
+          </g>
+        `;
+
+        // 4. Variables adicionales (E1, E2...) en modo multivariado
+        varsExtra.forEach((rawExtra, idx) => {
+          const nombreExtra = rawExtra.trim() || '(sin nombre)';
+          const nombreExtraCorto = acortarTextoSvg(nombreExtra, 22);
+          const yEx = yCentroV1 + 115 + idx * pasoExtra;
+          const pIniEx = puntoBordeCirculo(xV1, yEx, rExtra + 3, xV2, yCentroV2);
+          const pFinEx = puntoBordeCirculo(xV2, yCentroV2, rVar + 4, xV1, yEx);
+          const midExX = (pIniEx.x + pFinEx.x) / 2;
+          const midExY = (pIniEx.y + pFinEx.y) / 2;
+          const etiqEx = alcance === 'correlacional' ? 'r · HE' : alcance === 'explicativo' ? 'β · HE' : '? · HE';
+
+          capasLineas += `
+            <line x1="${pIniEx.x.toFixed(1)}" y1="${pIniEx.y.toFixed(1)}"
+              x2="${pFinEx.x.toFixed(1)}" y2="${pFinEx.y.toFixed(1)}"
+              stroke="#334155" stroke-width="1.5" stroke-dasharray="5 4" ${attrsMarcadores} />
+            <g>
+              <rect x="${(midExX - 27).toFixed(1)}" y="${(midExY - 11).toFixed(1)}"
+                width="54" height="22" rx="11" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.1" />
+              <text x="${midExX.toFixed(1)}" y="${(midExY + 3.5).toFixed(1)}" text-anchor="middle"
+                fill="#1e293b" font-family="Inter, sans-serif" font-size="10.5" font-weight="700">${etiqEx}</text>
+            </g>
+          `;
+
+          capasNodos += `
+            <g>
+              <title>${escHtml(nombreExtra)}</title>
+              <text x="${xV1}" y="${yEx - rExtra - 8}" text-anchor="middle" fill="#64748b"
+                font-family="Inter, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.8">VARIABLE</text>
+              <circle cx="${xV1}" cy="${yEx}" r="${rExtra}" fill="url(#plsGradVar)" stroke="#0f3561" stroke-width="2" />
+              <text x="${xV1}" y="${yEx + 4.5}" text-anchor="middle" fill="#ffffff"
+                font-family="Inter, sans-serif" font-size="13.5" font-weight="700">E${idx + 1}</text>
+              <text x="${xV1}" y="${yEx + rExtra + 16}" text-anchor="middle" fill="#334155"
+                font-family="Inter, sans-serif" font-size="11.5" font-style="italic">${escHtml(nombreExtraCorto)}</text>
+            </g>
+          `;
+        });
+
+        // 5. Círculos principales V1 y V2
+        const labelV1 = v1Raw || '(sin nombre)';
+        const labelV2 = v2Raw || '(sin nombre)';
+        const labelV1Corto = acortarTextoSvg(labelV1, 24);
+        const labelV2Corto = acortarTextoSvg(labelV2, 24);
+
+        capasNodos += `
+          <g>
+            <title>${escHtml(labelV1)}</title>
+            <text x="${xV1}" y="${yCentroV1 - rVar - 10}" text-anchor="middle" fill="#64748b"
+              font-family="Inter, sans-serif" font-size="10" font-weight="700" letter-spacing="0.9">VARIABLE</text>
+            <circle cx="${xV1}" cy="${yCentroV1}" r="${rVar}" fill="url(#plsGradVar)" stroke="#0f3561" stroke-width="2.2" />
+            <text x="${xV1}" y="${yCentroV1 + 5}" text-anchor="middle" fill="#ffffff"
+              font-family="Inter, sans-serif" font-size="15" font-weight="700">V1</text>
+            <text x="${xV1}" y="${yCentroV1 + rVar + 18}" text-anchor="middle" fill="#1e293b"
+              font-family="Inter, sans-serif" font-size="12" font-style="italic" font-weight="500">${escHtml(labelV1Corto)}</text>
+          </g>
+
+          <g>
+            <title>${escHtml(labelV2)}</title>
+            <text x="${xV2}" y="${yCentroV2 - rVar - 10}" text-anchor="middle" fill="#64748b"
+              font-family="Inter, sans-serif" font-size="10" font-weight="700" letter-spacing="0.9">VARIABLE</text>
+            <circle cx="${xV2}" cy="${yCentroV2}" r="${rVar}" fill="url(#plsGradVar)" stroke="#0f3561" stroke-width="2.2" />
+            <text x="${xV2}" y="${yCentroV2 + 5}" text-anchor="middle" fill="#ffffff"
+              font-family="Inter, sans-serif" font-size="15" font-weight="700">V2</text>
+            <text x="${xV2}" y="${yCentroV2 + rVar + 18}" text-anchor="middle" fill="#1e293b"
+              font-family="Inter, sans-serif" font-size="12" font-style="italic" font-weight="500">${escHtml(labelV2Corto)}</text>
+          </g>
+        `;
+
+        const ariaTexto = `Modelo con ${totalVars} variables y ${totalDims} dimensiones`;
+        contenedor.innerHTML = `
+          <svg id="svgModeloSmartPls" viewBox="0 0 ${ancho} ${alto}" style="width: 100%; height: auto; display: block;"
+            role="img" aria-label="${escHtml(ariaTexto)}" xmlns="http://www.w3.org/2000/svg">
+            ${defs}
+            ${capasLineas}
+            ${capasNodos}
+          </svg>
+        `;
+
+        // Texto descriptivo inferior dinámico
+        if (resumenEl) {
+          const tipoModeloTxt = diseno === 'multivariada' ? 'Modelo multivariado' : 'Modelo bivariado';
+          const detalleVarsTxt = nExtra > 0
+            ? `${totalVars} variables (V1, ${varsExtra.map((_, i) => 'E' + (i + 1)).join(', ')} → V2)`
+            : '2 variables (V1–V2)';
+          let sentidoTxt = 'elija el alcance para definir el sentido de las flechas.';
+          if (alcance === 'correlacional') {
+            sentidoTxt = 'alcance correlacional: relación bidireccional (↔) entre variables.';
+          } else if (alcance === 'explicativo') {
+            sentidoTxt = 'alcance explicativo: influencia direccional (→) hacia V2.';
+          }
+          resumenEl.textContent = `${tipoModeloTxt} · ${detalleVarsTxt} · ${totalDims} dimensiones · ${sentidoTxt}`;
+        }
+      }
+
+      function descargarModeloPng() {
+        const svgEl = document.getElementById('svgModeloSmartPls');
+        if (!svgEl) return;
+
+        const vb = svgEl.viewBox.baseVal;
+        const w = vb && vb.width ? vb.width : 860;
+        const h = vb && vb.height ? vb.height : 300;
+        const escala = 2;
+
+        const serializer = new XMLSerializer();
+        const svgStr = serializer.serializeToString(svgEl);
+        const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement('canvas');
+          canvas.width = w * escala;
+          canvas.height = h * escala;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          URL.revokeObjectURL(url);
+
+          canvas.toBlob(function (pngBlob) {
+            if (!pngBlob) return;
+            const pngUrl = URL.createObjectURL(pngBlob);
+            const a = document.createElement('a');
+            a.href = pngUrl;
+            a.download = 'Modelo_Estructural_SmartPLS.png';
+            a.click();
+            URL.revokeObjectURL(pngUrl);
+            if (typeof mostrarToast === 'function') {
+              mostrarToast('Gráfico PNG descargado ✔');
+            }
+          }, 'image/png');
+        };
+        img.src = url;
+      }
+
+      window.dibujarModelo = dibujarModelo;
+      window.descargarModeloPng = descargarModeloPng;
+
+      // Envolver renderizarTodoHtml sin modificar su código original
+      if (typeof window.renderizarTodoHtml === 'function') {
+        const renderOriginal = window.renderizarTodoHtml;
+        window.renderizarTodoHtml = function () {
+          const resultado = renderOriginal.apply(this, arguments);
+          dibujarModelo();
+          return resultado;
+        };
+      }
+
+      // Listeners globales con retraso corto para capturar cualquier cambio en tiempo real
+      let timerModelo = null;
+      function programarRedibujoModelo() {
+        clearTimeout(timerModelo);
+        timerModelo = setTimeout(dibujarModelo, 40);
+      }
+
+      document.addEventListener('input', programarRedibujoModelo);
+      document.addEventListener('change', programarRedibujoModelo);
+      document.addEventListener('click', programarRedibujoModelo);
+
+      window.addEventListener('load', function () {
+        dibujarModelo();
+      });
+
+      dibujarModelo();
+    })();
+  </script>
+
+</body>
+</html>
